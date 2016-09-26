@@ -19,5 +19,10 @@
   },
   "engines": {
     "node": "6.2.2"
+  },
+  "devDependencies": {
+    "body-parser": "^1.15.2",
+    "helmet": "^2.2.0",
+    "helmet-csp": "^1.2.2"
   }
 }

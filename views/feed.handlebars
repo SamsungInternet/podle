@@ -1,15 +1,15 @@
 
 {{#meta}}
 	{{#if description}}
-		<h2 style="padding: 0.4em; margin: 0 0 0.5em 0; opacity: 0.8; font-size: 1.4em;">{{description}}</h2>
+		<h2>{{description}}</h2>
 	{{/if}}
 {{/meta}}
 
 {{#items}}
-<a href="{{link}}" style="text-decoration: none; color: black;">
-	<div style="border-bottom: 1px dotted #bbb; padding: 0 0.5em 0em 0.5em; font-size: 1em;">
-		<h4 style="font-weight: 600; text-decoration:underline; font-size: 1.1em; line-height: 1.7em; margin: 0 0 0.3em 0;">{{title}}</h4>
+<a href="{{link}}">
+	<div>
+		<h4>{{title}}</h4>
 		{{#author}}{{author}} - {{/author}}{{humanDate}}
-		<p style="font-weight: 400; font-size: 0.9em; line-height: 1.3em; opacity: 1;">{{description}}</p>
+		<p>{{{description}}}</p>
 	</div>
 </a>{{/items}}

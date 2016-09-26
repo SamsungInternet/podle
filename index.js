@@ -9,6 +9,37 @@ const app = express();
 const qs = require('qs');
 const getRSSItem = require('./lib/get-rss-item');
 const getSearch = require('./lib/search');
+const bodyParser = require('body-parser');
+const helmet = require('helmet');
+const csp = require('helmet-csp');
+
+app.use(helmet());
+app.use(csp({
+	// Specify directives as normal.
+	directives: {
+		defaultSrc: ['\'self\'', 'default.com'],
+		scriptSrc: ['\'self\'', '\'unsafe-inline\''],
+		styleSrc: ['https://fonts.googleapis.com'],
+		fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
+		imgSrc: ['data:', 'https:'],
+		sandbox: ['allow-forms', 'allow-scripts'],
+		reportUri: '/report-violation',
+
+		objectSrc: [], // An empty array allows nothing through
+	},
+
+	// Set to true if you want to set all headers: Content-Security-Policy,
+	// X-WebKit-CSP, and X-Content-Security-Policy.
+	setAllHeaders: true,
+
+	// Set to true if you want to disable CSP on Android where it can be buggy.
+	disableAndroid: false,
+
+	// Set to false if you want to disable any user-agent sniffing.
+	// This may make the headers less compatible but it will be much faster.
+	// This defaults to `true`. Should be false if behind cdn.
+	browserSniff: false
+}));
 
 // Use Handlebars for templating
 const hbs = exphbs.create({
@@ -86,5 +117,18 @@ app.get('/:version/feed', function (req, res) {
 		layout: req.params.version
 	});
 });
+
+app.use(bodyParser.json({
+  type: ['json', 'application/csp-report']
+}))
+
+app.post('/report-violation', function (req, res) {
+  if (req.body) {
+    console.log('CSP Violation: ', req.body)
+  } else {
+    console.log('CSP Violation: No data received!')
+  }
+  res.status(204).end()
+})
 
 app.listen(process.env.PORT || 3000);
