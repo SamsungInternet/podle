@@ -1,0 +1,8 @@
+<h1>Search</h1>
+<pre>{{#each head}}{{@key}}: {{this}}
+{{/each}}</pre>
+<hr/>
+<h3>Search results</h3>
+{{#each body}}<div>
+	{{@index}}: <a href="/feed?url={{url}}">{{text}}</a>
+</div>{{/each}}

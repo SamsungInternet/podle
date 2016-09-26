@@ -1,0 +1,10 @@
+<h1>Debug</h1>
+<pre>{{#each meta}}{{@key}}: {{this}}
+{{/each}}</pre>
+<hr/>
+<h3>items:</h3>
+{{#each items}}<div>
+	{{@index}}<pre>
+{{#each this}}{{@key}}: {{this}}
+{{/each}}</pre>
+</div>{{/each}}

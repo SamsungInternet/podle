@@ -1,0 +1,10 @@
+<h1>Debug Search</h1>
+<pre>{{#each head}}{{@key}}: {{this}}
+{{/each}}</pre>
+<hr/>
+<h3>Search results</h3>
+{{#each body}}<div>
+	{{@index}}<pre>
+{{#each this}}{{@key}}: {{this}}
+{{/each}}</pre>
+</div>{{/each}}
