@@ -12,6 +12,7 @@ const getSearch = require('./lib/search');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const csp = require('helmet-csp');
+const audioProxy = require('./lib/audio-proxy');
 
 app.set('json spaces', 2);
 app.use(helmet());
@@ -52,6 +53,8 @@ const hbs = exphbs.create({
 
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
+
+app.get('/audioproxy/', audioProxy);
 
 app.get('/:version/search', function (req, res) {
 	const shoudDebug = !!req.query.debug;

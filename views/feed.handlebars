@@ -16,7 +16,7 @@
 		{{#media:content}}
 			<div class="audio-player">
 				<h3><a href="{{url}}" target="_blank" rel="noopener" rel="nofollow">{{../title}}</a></h3>
-				<audio src="{{url}}" controls preload="none" crossorigin="anonymous"></audio>
+				<audio src="/audioproxy?url={{url}}" controls preload="none"></audio>
 				<p>(<span class="filesize">{{filesize}}Bytes</span> {{type}})</p>
 			</div>
 		{{/media:content}}
