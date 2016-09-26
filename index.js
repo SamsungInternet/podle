@@ -12,7 +12,7 @@ const getSearch = require('./lib/search');
 
 // Use Handlebars for templating
 const hbs = exphbs.create({
-	defaultLayout: 'main',
+	defaultLayout: 'v1',
 	helpers: {
 		ifEq: function(a, b, options) { return (a === b) ? options.fn(this) : options.inverse(this); }
 	}
@@ -21,19 +21,23 @@ const hbs = exphbs.create({
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
-app.get('/search', function (req, res) {
+app.get('/:version/search', function (req, res) {
 	const shoudDebug = !!req.query.debug;
 	getSearch(req.query.term)
 	.then(function (result) {
+		result.layout = req.params.version;
 		res.render(shoudDebug ? 'search-debug' : 'search', result);
 	})
 	.catch(function (err) {
 		res.status(400);
-		res.render('error', { message: err.message });
+		res.render('error', {
+			message: err.message,
+			layout: req.params.version
+		});
 	});
 });
 
-app.get('/feed', function (req, res) {
+app.get('/:version/feed', function (req, res) {
 	if (req.query.url) {
 		return getRSSItem(decodeURIComponent(req.query.url))
 		.then(function (items) {
@@ -66,15 +70,20 @@ app.get('/feed', function (req, res) {
 				return item;
 			})
 
+			items.layout = req.params.version;
 			res.render(shoudDebug ? 'feed-debug' : 'feed', items);
 		}, function (err) {
 			res.status(400);
-			res.render('error', {message: err.message});
+			res.render('error', {
+				message: err.message,
+				layout: req.params.version
+			});
 		});
 	}
 	res.status(400);
 	res.render('error', {
-		message: 'Invalid RSS URL'
+		message: 'Invalid RSS URL',
+		layout: req.params.version
 	});
 });
 

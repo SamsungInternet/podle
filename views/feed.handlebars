@@ -1,52 +1,15 @@
-{{#ifEq size 'small' }}
-	{{#meta}}
-		{{#if description}}
-			<h2 style="margin: 0; opacity: 0.8; font-size: 0.9em; padding: 0.4em 0.4em 0;">{{description}}</h2>
-		{{/if}}
-	{{/meta}}
-	{{#items}}
-	<a href="{{link}}" style="text-decoration: none; color: black;">
-		<div style="border-bottom: 1px dotted #bbb; padding: 0.5em; font-size: 0.7em;">
-			<h4 style="font-weight: 600; font-size: 1.1em; line-height: 1.7em; margin: 0 0 0em 0; text-decoration: underline;">{{title}}</h4>
-			{{#author}}{{author}} - {{/author}}{{humanDate}}
-			<p style="font-weight: 400; font-size: 0.9em; line-height: 1.3em; opacity: 1; margin-top: 0.3em;">{{description}}</p>
-		</div>
-	</a>{{/items}}
 
-{{/ifEq}}
+{{#meta}}
+	{{#if description}}
+		<h2 style="padding: 0.4em; margin: 0 0 0.5em 0; opacity: 0.8; font-size: 1.4em;">{{description}}</h2>
+	{{/if}}
+{{/meta}}
 
-{{#ifEq size 'medium' }}
-	{{#meta}}
-		{{#if description}}
-			<h2 style="padding: 0.4em; margin: 0 0 0.5em 0; opacity: 0.8; font-size: 1.4em;">{{description}}</h2>
-		{{/if}}
-	{{/meta}}
-
-	{{#items}}
-	<a href="{{link}}" style="text-decoration: none; color: black;">
-		<div style="border-bottom: 1px dotted #bbb; padding: 0 0.5em 0em 0.5em; font-size: 1em;">
-			<h4 style="font-weight: 600; text-decoration:underline; font-size: 1.1em; line-height: 1.7em; margin: 0 0 0.3em 0;">{{title}}</h4>
-			{{#author}}{{author}} - {{/author}}{{humanDate}}
-			<p style="font-weight: 400; font-size: 0.9em; line-height: 1.3em; opacity: 1;">{{description}}</p>
-		</div>
-	</a>{{/items}}
-
-{{/ifEq}}
-
-{{#ifEq size 'full' }}
-	
-	{{#meta}}
-		{{#if description}}
-			<h2>{{description}}</h2>
-		{{/if}}
-	{{/meta}}
-	{{#items}}
-	<a href="{{link}}" style="text-decoration: none; color: black;">
-		<div style="border-bottom: 1px dotted #bbb; padding: 0 0.5em 0.5em 0.5em;">
-			<h4 style="font-size: 1.3em; text-decoration: underline;">{{title}}</h4>
-			{{#author}}{{author}} - {{/author}}{{humanDate}}
-			<p>{{description}}</p>
-		</div>
-	</a>{{/items}}
-
-{{/ifEq}}
+{{#items}}
+<a href="{{link}}" style="text-decoration: none; color: black;">
+	<div style="border-bottom: 1px dotted #bbb; padding: 0 0.5em 0em 0.5em; font-size: 1em;">
+		<h4 style="font-weight: 600; text-decoration:underline; font-size: 1.1em; line-height: 1.7em; margin: 0 0 0.3em 0;">{{title}}</h4>
+		{{#author}}{{author}} - {{/author}}{{humanDate}}
+		<p style="font-weight: 400; font-size: 0.9em; line-height: 1.3em; opacity: 1;">{{description}}</p>
+	</div>
+</a>{{/items}}
