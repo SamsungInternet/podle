@@ -13,11 +13,12 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const csp = require('helmet-csp');
 
+app.set('json spaces', 2);
 app.use(helmet());
 app.use(csp({
 	// Specify directives as normal.
 	directives: {
-		defaultSrc: ['\'self\'', 'default.com'],
+		defaultSrc: ['\'self\'', 'http:', 'https:'],
 		scriptSrc: ['\'self\'', '\'unsafe-inline\''],
 		styleSrc: ['https://fonts.googleapis.com'],
 		fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
@@ -73,12 +74,8 @@ app.get('/:version/feed', function (req, res) {
 		return getRSSItem(decodeURIComponent(req.query.url))
 		.then(function (items) {
 			const shoudDebug = !!req.query.debug;
-			const limit = req.query.max || 3;
+			const shoudJson = !!req.query.json;
 			const omits = req.query.omit ? req.query.omit.split(',') : [];
-
-			if (!shoudDebug) {
-				items.items = items.items.slice(0, limit);
-			}
 
 			if (omits.length) {
 				items.items.forEach(item => {
@@ -102,6 +99,9 @@ app.get('/:version/feed', function (req, res) {
 			})
 
 			items.layout = req.params.version;
+			if (shoudJson) {
+				return res.json(items);
+			}
 			res.render(shoudDebug ? 'feed-debug' : 'feed', items);
 		}, function (err) {
 			res.status(400);
@@ -119,16 +119,16 @@ app.get('/:version/feed', function (req, res) {
 });
 
 app.use(bodyParser.json({
-  type: ['json', 'application/csp-report']
-}))
+	type: ['json', 'application/csp-report']
+}));
 
 app.post('/report-violation', function (req, res) {
-  if (req.body) {
-    console.log('CSP Violation: ', req.body)
-  } else {
-    console.log('CSP Violation: No data received!')
-  }
-  res.status(204).end()
-})
+	if (req.body) {
+		console.log('CSP Violation: ', req.body)
+	} else {
+		console.log('CSP Violation: No data received!')
+	}
+	res.status(204).end()
+});
 
 app.listen(process.env.PORT || 3000);

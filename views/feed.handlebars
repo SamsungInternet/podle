@@ -1,15 +1,25 @@
 
+
 {{#meta}}
+	{{#if title}}
+		<h1>{{title}}</h1>
+	{{/if}}
 	{{#if description}}
-		<h2>{{description}}</h2>
+		<p>{{description}}</p>
 	{{/if}}
 {{/meta}}
 
 {{#items}}
-<a href="{{link}}">
 	<div>
-		<h4>{{title}}</h4>
-		{{#author}}{{author}} - {{/author}}{{humanDate}}
+		<a href="{{link}}"><h2>{{title}}</h2></a>
+		{{#if author}}{{author}} - {{/if}}{{humanDate}}
+		{{#media:content}}
+			<div class="audio-player">
+				<h3><a href="{{url}}" target="_blank" rel="noopener" rel="nofollow">{{../title}}</a></h3>
+				<audio src="{{url}}" controls preload="none" crossorigin="anonymous"></audio>
+				<p>(<span class="filesize">{{filesize}}Bytes</span> {{type}})</p>
+			</div>
+		{{/media:content}}
 		<p>{{{description}}}</p>
 	</div>
-</a>{{/items}}
+{{/items}}
