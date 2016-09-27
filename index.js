@@ -47,7 +47,9 @@ app.use(csp({
 const hbs = exphbs.create({
 	defaultLayout: 'v1',
 	helpers: {
-		ifEq: function(a, b, options) { return (a === b) ? options.fn(this) : options.inverse(this); }
+		ifEq: function(a, b, options) {
+			return (a === b) ? options.fn(this) : options.inverse(this);
+		}
 	}
 });
 
@@ -56,63 +58,64 @@ app.set('view engine', 'handlebars');
 
 app.get('/audioproxy/', audioProxy);
 
-app.get('/:version/search', function (req, res) {
+app.get('/:version/search', function(req, res) {
 	const shoudDebug = !!req.query.debug;
 	getSearch(req.query.term)
-	.then(function (result) {
-		result.layout = req.params.version;
-		res.render(shoudDebug ? 'search-debug' : 'search', result);
-	})
-	.catch(function (err) {
-		res.status(400);
-		res.render('error', {
-			message: err.message,
-			layout: req.params.version
-		});
-	});
-});
-
-app.get('/:version/feed', function (req, res) {
-	if (req.query.url) {
-		return getRSSItem(decodeURIComponent(req.query.url))
-		.then(function (items) {
-			const shoudDebug = !!req.query.debug;
-			const shoudJson = !!req.query.json;
-			const omits = req.query.omit ? req.query.omit.split(',') : [];
-
-			if (omits.length) {
-				items.items.forEach(item => {
-					omits.forEach(key => {
-						item[key] = undefined;
-					});
-				});
-			}
-
-			items.size = req.query.size || 'full';
-
-			if (omits.indexOf('heading') > -1){
-				delete items.meta.description;
-			}
-
-			items.items.forEach(item => {
-				const urlParts = item.link.split('?');
-			 	const params = qs.parse(urlParts[1]);
-			 	item.link = `${urlParts[0]}?${qs.stringify(params)}`;
-				return item;
-			})
-
-			items.layout = req.params.version;
-			if (shoudJson) {
-				return res.json(items);
-			}
-			res.render(shoudDebug ? 'feed-debug' : 'feed', items);
-		}, function (err) {
+		.then(function(result) {
+			result.layout = req.params.version;
+			result.term = req.query.term;
+			res.render(shoudDebug ? 'search-debug' : 'search', result);
+		})
+		.catch(function(err) {
 			res.status(400);
 			res.render('error', {
 				message: err.message,
 				layout: req.params.version
 			});
 		});
+});
+
+app.get('/:version/feed', function(req, res) {
+	if (req.query.url) {
+		return getRSSItem(decodeURIComponent(req.query.url))
+			.then(function(items) {
+				const shoudDebug = !!req.query.debug;
+				const shoudJson = !!req.query.json;
+				const omits = req.query.omit ? req.query.omit.split(',') : [];
+
+				if (omits.length) {
+					items.items.forEach(item => {
+						omits.forEach(key => {
+							item[key] = undefined;
+						});
+					});
+				}
+
+				items.size = req.query.size || 'full';
+
+				if (omits.indexOf('heading') > -1) {
+					delete items.meta.description;
+				}
+
+				items.items.forEach(item => {
+					const urlParts = item.link.split('?');
+					const params = qs.parse(urlParts[1]);
+					item.link = `${urlParts[0]}?${qs.stringify(params)}`;
+					return item;
+				})
+
+				items.layout = req.params.version;
+				if (shoudJson) {
+					return res.json(items);
+				}
+				res.render(shoudDebug ? 'feed-debug' : 'feed', items);
+			}, function(err) {
+				res.status(400);
+				res.render('error', {
+					message: err.message,
+					layout: req.params.version
+				});
+			});
 	}
 	res.status(400);
 	res.render('error', {
@@ -121,13 +124,13 @@ app.get('/:version/feed', function (req, res) {
 	});
 });
 
-app.get('/:version', function (req, res) {
+app.get('/:version', function(req, res) {
 	res.render('index', {
 		layout: req.params.version
 	});
 });
 
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
 	res.redirect('/v1/');
 });
 
@@ -136,7 +139,7 @@ app.use(bodyParser.json({
 	type: ['json', 'application/csp-report']
 }));
 
-app.post('/report-violation', function (req, res) {
+app.post('/report-violation', function(req, res) {
 	if (req.body) {
 		console.log('CSP Violation: ', req.body)
 	} else {

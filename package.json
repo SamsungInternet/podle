@@ -16,11 +16,11 @@
     "express-http-proxy": "^0.10.0",
     "feedparser": "^1.1.5",
     "file-type": "^3.8.0",
+    "helmet": "^2.2.0",
+    "helmet-csp": "^1.2.2",
     "moment": "^2.15.1",
     "request": "^2.75.0",
-    "xml2js": "^0.4.17",
-    "helmet": "^2.2.0",
-    "helmet-csp": "^1.2.2"
+    "xml2js": "^0.4.17"
   },
   "engines": {
     "node": "6.2.2"
