@@ -1,3 +1,28 @@
 {{> header }}
 
 <h2>Introduction</h2>
+
+<p>Podle is a podcast streaming service to allow the searching and playing of Podcasts in your browser!!</p>
+
+{{#ifEq layout 'v1' }}
+	<p>
+		The goals of 'v1' is to demonstrate the site without CSS or JS. To show that it still is usable.
+		This allows the site to work where assets have failed to load or are unsupported by the user's browser.
+		It uses HTML5 tags such as <audio></audio> but accounts that they may not work by providing links back to the existing material.
+	</p>
+{{/ifEq}}
+
+{{#ifEq layout 'v2' }}
+	<p>
+		This is the minimum viable site. It has basic CSS and it works. This is supposed to demonstrate a legacy site.
+	</p>
+{{/ifEq}}
+
+{{#ifEq layout 'v3' }}
+	<p>
+		This redesigns the site's style sheets so that it is repsonsively designed. This provides a better experience for mobile platforms.
+
+		It also starts controlling the UI with JavaScript
+	</p>
+{{/ifEq}}
+
