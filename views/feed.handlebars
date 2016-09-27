@@ -9,17 +9,22 @@
 	{{/if}}
 {{/meta}}
 
+<div class="items">
 {{#items}}
 	<div class="podcast-item">
-		<h2><a href="{{link}}">{{title}}</a></h2>
-		<p>{{#if author}}{{author}} - {{/if}}{{humanDate}}</p>
+		<div class="podcast-item__meta">
+			<h2 class="podcast-item__meta-title"><a href="#{{#mangle}}{{title}}{{/mangle}}" id="{{#mangle}}{{title}}{{/mangle}}">{{title}}</a></h2>
+			<time>Updated - {{humanDate}}</time>
+			<p class="podcast-item__meta-byline"><a href="{{link}}">by {{#if author}}<span class="author">{{author}}</span>{{/if}}</a></p>
+		</div>
 		{{#media:content}}
-			<div class="audio-player">
-				<h3><a href="{{url}}" target="_blank" rel="noopener" rel="nofollow">{{../title}}</a></h3>
+			<div class="podcast-item__audio-player">
+				<h3><a href="{{url}}" target="_blank" rel="noopener" rel="nofollow">{{../title}}</h3>
 				<audio src="/audioproxy?url={{url}}" controls preload="none"></audio>
-				<p>(<span class="filesize">{{filesize}}Bytes</span> {{type}})</p>
+				<p>(<span class="filesize">{{#bytesToMegabytes}}{{filesize}}{{/bytesToMegabytes}}</span> {{type}})</p>
 			</div>
 		{{/media:content}}
 		<p>{{{description}}}</p>
 	</div>
 {{/items}}
+</div>

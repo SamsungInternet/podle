@@ -20,7 +20,7 @@ app.use(csp({
 	// Specify directives as normal.
 	directives: {
 		defaultSrc: ['\'self\'', 'http:', 'https:'],
-		scriptSrc: ['\'self\'', '\'unsafe-inline\''],
+		scriptSrc: ['\'self\'', '\'unsafe-inline\'', 'https://cdn.polyfill.io'],
 		styleSrc: ['\'self\'', 'https://fonts.googleapis.com'],
 		fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
 		imgSrc: ['data:', 'https:'],
@@ -49,6 +49,12 @@ const hbs = exphbs.create({
 	helpers: {
 		ifEq: function(a, b, options) {
 			return (a === b) ? options.fn(this) : options.inverse(this);
+		},
+		mangle: function(options) {
+			return options.fn(this).replace(/[^a-z0-9]+/ig,'-');
+		},
+		bytesToMegabytes: function(options) {
+			return (Number(options.fn(this))/(1024*1024)).toFixed(2) + 'MB'
 		}
 	}
 });
@@ -105,6 +111,7 @@ app.get('/:version/feed', function(req, res) {
 				})
 
 				items.layout = req.params.version;
+				items.title = items.meta.title;
 				if (shoudJson) {
 					return res.json(items);
 				}
@@ -131,7 +138,7 @@ app.get('/:version', function(req, res) {
 });
 
 app.get('/', function(req, res) {
-	res.redirect('/v3/');
+	res.redirect('/v4/');
 });
 
 app.use(bodyParser.json({

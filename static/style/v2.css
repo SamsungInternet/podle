@@ -44,7 +44,7 @@ header {
 	margin: 1em;
 }
 
-.audio-player {
+.podcast-item__audio-player {
 	margin: 1em;
     padding: 0.5em;
     border: 1px solid grey;
