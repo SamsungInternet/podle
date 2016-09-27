@@ -131,7 +131,7 @@ app.get('/:version', function(req, res) {
 });
 
 app.get('/', function(req, res) {
-	res.redirect('/v1/');
+	res.redirect('/v3/');
 });
 
 app.use(bodyParser.json({
