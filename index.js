@@ -121,6 +121,17 @@ app.get('/:version/feed', function (req, res) {
 	});
 });
 
+app.get('/:version', function (req, res) {
+	res.render('index', {
+		layout: req.params.version
+	});
+});
+
+app.get('/', function (req, res) {
+	res.redirect('/v1/');
+});
+
+
 app.use(bodyParser.json({
 	type: ['json', 'application/csp-report']
 }));
