@@ -21,7 +21,7 @@ app.use(csp({
 	directives: {
 		defaultSrc: ['\'self\'', 'http:', 'https:'],
 		scriptSrc: ['\'self\'', '\'unsafe-inline\''],
-		styleSrc: ['https://fonts.googleapis.com'],
+		styleSrc: ['\'self\'', 'https://fonts.googleapis.com'],
 		fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
 		imgSrc: ['data:', 'https:'],
 		sandbox: ['allow-forms', 'allow-scripts'],
@@ -134,7 +134,6 @@ app.get('/', function(req, res) {
 	res.redirect('/v1/');
 });
 
-
 app.use(bodyParser.json({
 	type: ['json', 'application/csp-report']
 }));
@@ -147,5 +146,9 @@ app.post('/report-violation', function(req, res) {
 	}
 	res.status(204).end()
 });
+
+app.use('/static', express.static(__dirname + '/static', {
+	maxAge: 3600*1000*24
+}));
 
 app.listen(process.env.PORT || 3000);
