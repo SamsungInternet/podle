@@ -3,13 +3,12 @@
 	<head>
 		<title>Podle {{#if title}}- {{ title }}{{else}}Podcasts{{/if}}</title>
 		<meta charset="utf-8">
-		<meta http-equiv="cleartype" content="on">
-		<meta name="MobileOptimized" content="width">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="HandheldFriendly" content="true">
-		<link rel="stylesheet" href="/static/style/v3.css">
+		<link rel="stylesheet" href="/static/style/v2.css">
 	</head>
 	<body>
 		{{{body}}}
+		<script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+		<script src="/static/scripts/third-party/localforage.nopromises.min.js"></script>
+		<script src="/static/scripts/buttons-v4.js"></script>
 	</body>
 </html>
