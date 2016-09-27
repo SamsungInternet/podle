@@ -87,28 +87,14 @@ app.get('/:version/feed', function(req, res) {
 			.then(function(items) {
 				const shoudDebug = !!req.query.debug;
 				const shoudJson = !!req.query.json;
-				const omits = req.query.omit ? req.query.omit.split(',') : [];
-
-				if (omits.length) {
-					items.items.forEach(item => {
-						omits.forEach(key => {
-							item[key] = undefined;
-						});
-					});
-				}
 
 				items.size = req.query.size || 'full';
 
-				if (omits.indexOf('heading') > -1) {
-					delete items.meta.description;
-				}
-
 				items.items.forEach(item => {
-					const urlParts = item.link.split('?');
-					const params = qs.parse(urlParts[1]);
-					item.link = `${urlParts[0]}?${qs.stringify(params)}`;
-					return item;
-				})
+					if (item.enclosures && !item['media:content']) {
+						item['media:content'] = item.enclosures;
+					}
+				});
 
 				items.layout = req.params.version;
 				items.title = items.meta.title;
