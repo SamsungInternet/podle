@@ -69,6 +69,7 @@ function addFeedItemButtons(item, read, listed) {
 	tempButton.dataset.feedId = feedId;
 	tempButton.dataset.feedItemId = feedItemId;
 	tempButton.textContent = read ? 'Mark as Unfinished' : 'Mark as Finished';
+	tempButton.title = tempButton.textContent;
 	tempButton.classList.add('feed-item__meta-button-finished');
 	buttonArea.appendChild(tempButton);
 
@@ -78,6 +79,7 @@ function addFeedItemButtons(item, read, listed) {
 	tempButton.dataset.feedItemId = feedItemId;
 	tempButton.dataset.title = title;
 	tempButton.textContent = listed ? 'Remove from List' : 'Add to List';
+	tempButton.title = tempButton.textContent;
 	tempButton.classList.add('feed-item__meta-button-add-to-list');
 	buttonArea.appendChild(tempButton);
 
@@ -133,6 +135,7 @@ function addFeedButton(el, isSaved) {
 		button.dataset.name = el.dataset.name;
 		var action = isSaved === true ? 'remove' : 'add';
 		button.textContent = isSaved === true ? 'Remove from my podcasts' : 'Add to my podcasts';
+		button.title = button.textContent;
 		button.dataset.action = action;
 		el.appendChild(button);
 	}

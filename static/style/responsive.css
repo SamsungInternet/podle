@@ -1,86 +1,13 @@
-* {
-	box-sizing: border-box;
-}
-
-body {
-	font-family: 'Helvetica', 'Sans';
-	font-size: 16px;
-	color: #333;
-	padding: 0 1em;
-}
-
 html, body {
     box-sizing: content-box;
     overflow-x: hidden;
     max-width: 100vw;
 }
 
-p {
-	line-height: 1.5em;
-    max-width: 40em;
-	text-rendering: optimizeLegibility;
-}
-
-/**
-	Garuntee minimum paragraph widths around floats
-*/
-p:before {
-    content: "";
-    width: 12em;
-    display: block;
-    overflow: hidden;
-}
-
-header {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	flex-wrap: wrap;
-	padding-right: 2em;
-}
-
-.feed-title {
-	position: sticky;
-	top: 0;
-	padding-top: 0.3em;
-	background: white;
-	border-bottom: 1px solid grey;
-}
-
 .items {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-}
-
-.feed-item {
-	padding: 1em;
-}
-
-.feed-item__audio-player {
-    padding: 0.5em;
-    border: 1px solid grey;
-    display: inline-block;
-    float: left;
-	margin-right: 1em;
-}
-
-.feed-item__meta {
-	margin-bottom: 1em;
-}
-
-.feed-item__meta-title {
-	margin: 0.2em 0;
-}
-
-.feed-item__meta time {
-	font-size: 80%;
-}
-
-.feed-item__meta-byline {
-	color: #aaa;
-	font-style: italic;
-	margin: 0;
 }
 
 audio {
