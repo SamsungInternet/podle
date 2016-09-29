@@ -160,7 +160,7 @@ function updateAllPodcastUI() {
 		include_docs: true
 	}).then(function(result) {
 		var listHTML = '';
-		var addFeedTargets = new Set(document.querySelectorAll('.feed-detail'));
+		var addFeedTargets = new Set(Array.from(document.querySelectorAll('.feed-detail')));
 		var finishedWith = [];
 
 		if (result.total_rows) {
