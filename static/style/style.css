@@ -40,11 +40,11 @@ header {
 	padding-left: 2rem;
 }
 
-.podcast-item {
+.feed-item {
 	margin: 1em;
 }
 
-.podcast-item__audio-player {
+.feed-item__audio-player {
 	margin: 1em;
     padding: 0.5em;
     border: 1px solid grey;

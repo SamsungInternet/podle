@@ -9,14 +9,14 @@
 
 <div class="items">
 {{#items}}
-	<div class="podcast-item">
-		<div class="podcast-item__meta">
-			<h2 class="podcast-item__meta-title"><a href="#{{#mangle}}{{title}}{{/mangle}}" id="{{#mangle}}{{title}}{{/mangle}}">{{title}}</a></h2>
+	<div class="feed-item">
+		<div class="feed-item__meta feed-item-detail" data-feed="{{#encodeURIComponent}}{{{ ../url }}}{{/encodeURIComponent}}" data-title="{{title}}" data-feed-item-id="{{#encodeURIComponent}}{{{ ../url }}}{{/encodeURIComponent}}__{{#mangle}}{{title}}{{/mangle}}">
+			<h2 class="feed-item__meta-title"><a href="#{{#mangle}}{{title}}{{/mangle}}" id="{{#mangle}}{{title}}{{/mangle}}">{{title}}</a></h2>
 			<time>Updated - {{humanDate}}</time>
-			<p class="podcast-item__meta-byline"><a href="{{link}}">by {{#if author}}<span class="author">{{author}}</span>{{/if}}</a></p>
+			<p class="feed-item__meta-byline"><a href="{{link}}">by {{#if author}}<span class="author">{{author}}</span>{{/if}}</a></p>
 		</div>
 		{{#media:content}}
-			<div class="podcast-item__audio-player">
+			<div class="feed-item__audio-player">
 				<h3><a href="{{url}}" target="_blank" rel="noopener" rel="nofollow">{{../title}}</h3>
 				<audio src="/audioproxy?url={{url}}" controls preload="none"></audio>
 				<p>(<span class="filesize">{{#bytesToMegabytes}}{{filesize}}{{/bytesToMegabytes}}</span> {{type}})</p>

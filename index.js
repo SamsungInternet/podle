@@ -6,7 +6,6 @@ require('dotenv').config();
 const express = require('express');
 const exphbs = require('express-handlebars');
 const app = express();
-const qs = require('qs');
 const getRSSItem = require('./lib/get-rss-item');
 const getSearch = require('./lib/search');
 const bodyParser = require('body-parser');

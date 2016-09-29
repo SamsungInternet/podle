@@ -53,11 +53,11 @@ header {
 	align-items: center;
 }
 
-.podcast-item {
+.feed-item {
 	padding: 1em;
 }
 
-.podcast-item__audio-player {
+.feed-item__audio-player {
     padding: 0.5em;
     border: 1px solid grey;
     display: inline-block;
@@ -65,19 +65,19 @@ header {
 	margin-right: 1em;
 }
 
-.podcast-item__meta {
+.feed-item__meta {
 	margin-bottom: 1em;
 }
 
-.podcast-item__meta-title {
+.feed-item__meta-title {
 	margin: 0.2em 0;
 }
 
-.podcast-item__meta time {
+.feed-item__meta time {
 	font-size: 80%;
 }
 
-.podcast-item__meta-byline {
+.feed-item__meta-byline {
 	color: #aaa;
 	font-style: italic;
 	margin: 0;
