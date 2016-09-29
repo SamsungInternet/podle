@@ -1,9 +1,7 @@
 {{> header }}
 
 {{#meta}}
-	{{#if title}}
-		<h1 class="feed-title">{{title}}</h1>
-	{{/if}}
+	<h1 class="feed-title feed-detail" data-url="{{#encodeURIComponent}}{{{ ../url }}}{{/encodeURIComponent}}" data-name="{{ title }}">{{title}}</h1>
 	{{#if description}}
 		<p class="description">{{description}}</p>
 	{{/if}}

@@ -24,8 +24,8 @@ app.use(csp({
 		styleSrc: ['\'self\'', 'https://fonts.googleapis.com'],
 		fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
 		imgSrc: ['data:', 'https:'],
-		sandbox: ['allow-forms', 'allow-scripts'],
 		reportUri: '/report-violation',
+		frameAncestors: ['none'],
 
 		objectSrc: [], // An empty array allows nothing through
 	},
@@ -54,7 +54,10 @@ const hbs = exphbs.create({
 			return options.fn(this).replace(/[^a-z0-9]+/ig,'-');
 		},
 		bytesToMegabytes: function(options) {
-			return (Number(options.fn(this))/(1024*1024)).toFixed(2) + 'MB'
+			return (Number(options.fn(this)) / (1024 * 1024)).toFixed(2) + 'MB';
+		},
+		encodeURIComponent: function(options) {
+			return encodeURIComponent(options.fn(this));
 		}
 	}
 });
@@ -83,32 +86,25 @@ app.get('/:version/search', function(req, res) {
 
 app.get('/:version/feed', function(req, res) {
 	if (req.query.url) {
-		return getRSSItem(decodeURIComponent(req.query.url))
+		let url = req.query.url;
+		if (url.match(/^https?%3A%2F%2F/i)) {
+			url = decodeURIComponent(url);
+		}
+		console.log(url);
+		return getRSSItem(url)
 			.then(function(items) {
 				const shoudDebug = !!req.query.debug;
 				const shoudJson = !!req.query.json;
-				const omits = req.query.omit ? req.query.omit.split(',') : [];
-
-				if (omits.length) {
-					items.items.forEach(item => {
-						omits.forEach(key => {
-							item[key] = undefined;
-						});
-					});
-				}
 
 				items.size = req.query.size || 'full';
-
-				if (omits.indexOf('heading') > -1) {
-					delete items.meta.description;
-				}
+				items.url = url;
 
 				items.items.forEach(item => {
 					const urlParts = item.link.split('?');
 					const params = qs.parse(urlParts[1]);
 					item.link = `${urlParts[0]}?${qs.stringify(params)}`;
 					return item;
-				})
+				});
 
 				items.layout = req.params.version;
 				items.title = items.meta.title;
@@ -120,6 +116,7 @@ app.get('/:version/feed', function(req, res) {
 				res.status(400);
 				res.render('error', {
 					message: err.message,
+					url: url,
 					layout: req.params.version
 				});
 			});
