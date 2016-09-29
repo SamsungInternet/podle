@@ -100,10 +100,9 @@ app.get('/:version/feed', function(req, res) {
 				items.url = url;
 
 				items.items.forEach(item => {
-					const urlParts = item.link.split('?');
-					const params = qs.parse(urlParts[1]);
-					item.link = `${urlParts[0]}?${qs.stringify(params)}`;
-					return item;
+					if (item.enclosures && !item['media:content']) {
+						item['media:content'] = item.enclosures;
+					}
 				});
 
 				items.layout = req.params.version;
