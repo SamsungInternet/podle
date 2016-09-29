@@ -12,7 +12,7 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const csp = require('helmet-csp');
 const audioProxy = require('./lib/audio-proxy');
-const redisSplit = require('redis-url').parse(process.env.REDIS_SERVER);
+const redisSplit = require('redis-url').parse(process.env.REDIS_URL);
 const cache = require('express-redis-cache')({
 	host: redisSplit.hostname, port: Number(redisSplit.port), auth_pass: redisSplit.password
 });
