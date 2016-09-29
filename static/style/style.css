@@ -6,13 +6,20 @@ body {
 	font-family: 'Helvetica', 'Sans';
 	font-size: 16px;
 	color: #333;
-	padding: 0 1em;
+	padding: 0 1rem;
+	background: white;
+	margin: 0;
 }
 
 p {
 	line-height: 1.5em;
     max-width: 40em;
 	text-rendering: optimizeLegibility;
+}
+
+a, a:visited, a:active {
+	color: #0CA5B0;
+	text-decoration: none;
 }
 
 /**
@@ -31,6 +38,25 @@ header {
 	justify-content: space-between;
 	flex-wrap: wrap;
 	padding-right: 2em;
+	margin: 0 -1rem;
+	padding: 1rem;
+	background: #4E3F30;
+	border-bottom: 0.5rem solid #0CA5B0;
+	color: white;
+}
+
+header h1 a,
+header h1 a:visited
+header h1 a:active {
+	color: white !important;
+	text-decoration: none;
+}
+
+main {
+	background: white;
+	margin-top: 1em;
+	padding:  0 0.5rem;
+	padding-bottom: 2em;
 }
 
 .feed-title {
@@ -43,14 +69,35 @@ header {
 
 .feed-item {
 	padding: 1em;
+	background: #FEFEEB;
+	border-bottom: 0.5rem solid #0CA5B0;
+	padding-bottom: 2e;
+	margin-bottom: 2em;
+    box-shadow: 0 0 1em -0.5em #4E3F30;
 }
 
 .feed-item__audio-player {
     padding: 0.5em;
-    border: 1px solid grey;
     display: inline-block;
     float: left;
 	margin-right: 1em;
+	background: #4E3F30;
+	border-bottom: 0.5rem solid #0CA5B0;
+	color: white;
+}
+
+.feed-item__audio-player span {
+	display: block;
+}
+
+.feed-item__audio-player a,
+.feed-item__audio-player a:visited,
+.feed-item__audio-player a:active {
+	color: white;
+}
+
+.feed-item__audio-player audio {
+	margin: 1rem 0;
 }
 
 .feed-item__meta {
@@ -79,7 +126,7 @@ header {
 .feed-item__meta-button-add-to-list:before,
 .feed-item__meta-button-finished:before {
 	content: "\2606";
-	color: goldenrod;
+	color: #0CA5B0;
 	font-size: 1.5rem;
 	line-height: 1rem;
 	margin-right: 0.1rem;
@@ -88,11 +135,10 @@ header {
 .feed-item__meta-button-add-remove-to-my-podcasts[data-action="remove"]:before,
 .feed-item__meta-button-add-to-list[data-action="unlist"]:before {
 	content: "\2605";
-	text-shadow: 0 0 0.5rem yellow;
 }
 
 .feed-item__meta-button-finished:before {
-	color: green;
+	color: #0CA5B0;
 	content: " ";
 	display: inline-block;
 	width: 1rem;
@@ -100,7 +146,7 @@ header {
 	font-size: 1.5rem;
 	overflow: hidden;
 	text-align: center;
-	border: 1px solid grey;
+	border: 2px solid #4E3F30;
 	border-radius: 20%;
 }
 .feed-item__meta-button-finished[data-action="unfinish"]:before {
@@ -110,8 +156,13 @@ header {
 .feed-item__meta-button-add-remove-to-my-podcasts,
 .feed-item__meta-button-add-to-list,
 .feed-item__meta-button-finished {
+	cursor: pointer;
     border: none;
     background: transparent;
     font-size: 0rem;
 	margin-left: 1em;
+}
+
+.feed-item__meta-button-area {
+	float: right;
 }

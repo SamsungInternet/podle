@@ -18,10 +18,3 @@ header div {
     flex-grow: 1;
     text-align: right;
 }
-
-.feed-item {
-	border: 1px solid lightgray;
-    box-shadow: 0 0 2em -0.5em;
-    overflow: hidden;
-	margin-bottom: 2em;
-}
