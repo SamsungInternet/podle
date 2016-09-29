@@ -12,11 +12,9 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const csp = require('helmet-csp');
 const audioProxy = require('./lib/audio-proxy');
-const redisSplit = process.env.REDIS_SERVER.split(':');
-const redisPort = redisSplit.pop();
-const redisHost = redisSplit.join(':');
+const redisSplit = require('redis-url').parse(process.env.REDIS_SERVER);
 const cache = require('express-redis-cache')({
-	host: redisHost, port: redisPort
+	host: redisSplit.hostname, port: Number(redisSplit.port), auth_pass: redisSplit.password
 });
 
 app.set('json spaces', 2);
