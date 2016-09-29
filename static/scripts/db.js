@@ -29,11 +29,33 @@ function finishedWith(e) {
 	});
 }
 
+function removeDoc(doc) {
+	doc._deleted = true;
+	return doc;
+}
+
+function onAddToMyPodcasts(e) {
+	var doc = {
+		_id: e.target.dataset.url,
+		type: 'feed',
+		title: e.target.dataset.name,
+		url: e.target.dataset.url,
+		read: []
+	};
+	if (e.target.dataset.action === 'add') dbPodcasts
+		.put(doc)
+		.catch(handleErr);
+	if (e.target.dataset.action === 'remove') dbPodcasts
+		.get(doc._id).then(removeDoc)
+		.then(dbPodcasts.put.bind(dbPodcasts))
+		.catch(handleErr);
+}
 function onAddToList(e) {
 	var doc = {
 		_id: e.target.dataset.feedItemId,
 		type: 'feed-item',
-		title: e.target.dataset.title
+		title: e.target.dataset.title,
+		mediaUrl: e.target.dataset.mediaUrl
 	};
 	if (e.target.dataset.action === 'list') dbPodcastItems
 		.put(doc)
@@ -51,6 +73,7 @@ function addFeedItemButtons(item, read, listed) {
 	var feedId = item.dataset.feed;
 	var feedItemId = item.dataset.feedItemId;
 	var title = item.dataset.title;
+	var mediaUrl = item.dataset.mediaUrl;
 
 	var oldBox = item.querySelector('.feed-item__meta-button-area');
 	if (oldBox) item.removeChild(oldBox);
@@ -77,36 +100,16 @@ function addFeedItemButtons(item, read, listed) {
 	tempButton.addEventListener('click', onAddToList);
 	tempButton.dataset.action = listed ? 'unlist' : 'list';
 	tempButton.dataset.feedItemId = feedItemId;
+	tempButton.dataset.mediaUrl = mediaUrl;
 	tempButton.dataset.title = title;
 	tempButton.textContent = listed ? 'Remove from List' : 'Add to List';
 	tempButton.title = tempButton.textContent;
 	tempButton.classList.add('feed-item__meta-button-add-to-list');
 	buttonArea.appendChild(tempButton);
 
-	item.appendChild(buttonArea);
+	item.insertBefore(buttonArea, item.firstChild);
 };
 
-function removeDoc(doc) {
-	doc._deleted = true;
-	return doc;
-}
-
-function onAddToMyPodcasts(e) {
-	var doc = {
-		_id: e.target.dataset.url,
-		type: 'feed',
-		title: e.target.dataset.name,
-		url: e.target.dataset.url,
-		read: []
-	};
-	if (e.target.dataset.action === 'add') dbPodcasts
-		.put(doc)
-		.catch(handleErr);
-	if (e.target.dataset.action === 'remove') dbPodcasts
-		.get(doc._id).then(removeDoc)
-		.then(dbPodcasts.put.bind(dbPodcasts))
-		.catch(handleErr);
-}
 
 function addFeedButton(el, isSaved) {
 	if (typeof isSaved !== 'boolean') throw Error('Is saved needs to be boolean');
@@ -203,7 +206,7 @@ function updatePodcastItemsUI(readItems) {
 			var hash = feedUrl.pop();
 			feedUrl = feedUrl.join('__');
 
-			listHTML += '<li class="feed-item-detail" data-feed-item-id="' + safeString(row.id) +'" data-title="' + safeString(row.doc.title) +'" data-feed="' + feedUrl + '"><a href="feed?url=' + feedUrl + '#' + hash + '">' + safeString(row.doc.title) + '</a></li>';
+			listHTML += '<li class="feed-item-detail" data-feed-item-id="' + safeString(row.id) +'" data-title="' + safeString(row.doc.title) +'" data-feed="' + feedUrl + '"><a href="feed?url=' + feedUrl + '#' + hash + '">' + safeString(row.doc.title) + '</a><div><audio src="/audioproxy?url=' + encodeURIComponent(row.doc.mediaUrl) + '" controls preload="none"></audio></div></li>';
 			return row.id;
 		});
 
