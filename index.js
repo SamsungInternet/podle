@@ -2,7 +2,8 @@
 /* eslint no-console: 0 */
 'use strict';
 
-require('dotenv').config();
+require('dotenv').config({silent: true});
+Error.stackTraceLimit = Infinity;
 const express = require('express');
 const exphbs = require('express-handlebars');
 const app = express();
