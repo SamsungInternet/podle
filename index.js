@@ -14,7 +14,14 @@ const csp = require('helmet-csp');
 const audioProxy = require('./lib/audio-proxy');
 const redisSplit = require('redis-url').parse(process.env.REDIS_URL);
 const cache = require('express-redis-cache')({
-	host: redisSplit.hostname, port: Number(redisSplit.port), auth_pass: redisSplit.password
+	host: redisSplit.hostname, port: Number(redisSplit.port), auth_pass: redisSplit.password,
+    expire: {
+      '200': 5000,
+      '4xx': 10,
+      '403': 5000,
+      '5xx': 10,
+      'xxx': 1
+    }
 });
 const URL = require('url');
 const querystring = require('querystring');
@@ -72,7 +79,7 @@ app.set('view engine', 'handlebars');
 
 app.get('/audioproxy/', audioProxy);
 
-app.get('/:version/search', cache.route(3600*24*30), function(req, res) {
+app.get('/:version/search', cache.route(), function(req, res) {
 	const shoudDebug = !!req.query.debug;
 	getSearch(req.query.term)
 		.then(function(result) {
