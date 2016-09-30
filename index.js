@@ -23,8 +23,6 @@ const cache = require('express-redis-cache')({
       'xxx': 1
     }
 });
-const URL = require('url');
-const querystring = require('querystring');
 
 app.set('json spaces', 2);
 app.use(helmet());
@@ -104,12 +102,6 @@ app.get('/:version/feed', function(req, res) {
 		if (url.match(/^https?%3A%2F%2F/i)) {
 			url = decodeURIComponent(url);
 		}
-		url = URL.parse(url);
-		delete url.search;
-		url.query = querystring.parse(url.query);
-		url.query.format = 'xml';
-		url.query.fmt = 'xml';
-		url = URL.format(url);
 
 		return getRSSItem(url)
 			.then(function(items) {
@@ -154,7 +146,7 @@ app.get('/:version', function(req, res) {
 });
 
 app.get('/', function(req, res) {
-	res.redirect('/v4/');
+	res.redirect('/v5/');
 });
 
 app.use(bodyParser.json({
