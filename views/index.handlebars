@@ -30,7 +30,19 @@
 
 {{#ifEq layout 'v5' }}
 	<p>
-		This adds new app-like interfaces as well as the web app manifest file to make adding it the home screen a great experience.
+		This adds the home screen meta data for icons and names.
+	</p>
+{{/ifEq}}
+
+{{#ifEq layout 'v6' }}
+	<p>
+		This adds a service worker for offline support.
+	</p>
+{{/ifEq}}
+
+{{#ifEq layout 'v6' }}
+	<p>
+		This adds push notifications.
 	</p>
 {{/ifEq}}
 
