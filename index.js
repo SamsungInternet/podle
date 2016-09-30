@@ -16,6 +16,8 @@ const redisSplit = require('redis-url').parse(process.env.REDIS_URL);
 const cache = require('express-redis-cache')({
 	host: redisSplit.hostname, port: Number(redisSplit.port), auth_pass: redisSplit.password
 });
+const URL = require('url');
+const querystring = require('querystring');
 
 app.set('json spaces', 2);
 app.use(helmet());
@@ -87,12 +89,21 @@ app.get('/:version/search', cache.route(3600*24*30), function(req, res) {
 		});
 });
 
-app.get('/:version/feed', cache.route(3600), function(req, res) {
+app.get('/:version/feed', function(req, res) {
 	if (req.query.url) {
+
+		// Parse and add format querystrings
 		let url = req.query.url;
 		if (url.match(/^https?%3A%2F%2F/i)) {
 			url = decodeURIComponent(url);
 		}
+		url = URL.parse(url);
+		delete url.search;
+		url.query = querystring.parse(url.query);
+		url.query.format = 'xml';
+		url.query.fmt = 'xml';
+		url = URL.format(url);
+
 		return getRSSItem(url)
 			.then(function(items) {
 				const shoudDebug = !!req.query.debug;
@@ -145,7 +156,7 @@ app.use(bodyParser.json({
 
 app.post('/report-violation', function(req, res) {
 	if (req.body) {
-		console.log('CSP Violation: ', req.body)
+		console.log('CSP Violation: ', req.body['csp-report']['blocked-uri'])
 	} else {
 		console.log('CSP Violation: No data received!')
 	}
