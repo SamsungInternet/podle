@@ -9,6 +9,24 @@ var handleErr = function(e) {
 	console.log(e);
 }
 
+function markAllAsFinished(e) {
+	var feed = e.target.dataset.feedId;
+	var action = e.target.dataset.action;
+	return dbPodcasts.get(feed).then(function (doc) {
+		if (action === 'finish') {
+			doc.read = Array.from(new Set(Array.from(document.querySelectorAll('[data-feed-item-id]')).map(function (el) {
+				return el.dataset.feedItemId;
+			})));
+			e.target.dataset.action = 'unfinish';
+		}
+		if (action === 'unfinish') {
+			e.target.dataset.action = 'finish';
+			doc.read = [];
+		}
+		return dbPodcasts.put(doc);
+	});
+}
+
 function finishedWith(e) {
 	var feed = e.target.dataset.feedId;
 	var id = e.target.dataset.feedItemId;
@@ -22,7 +40,7 @@ function finishedWith(e) {
 		}
 		if (action === 'unfinish') {
 			doc.read = doc.read.filter(function (a) {
-				a !== id;
+				return a !== id;
 			});
 		}
 		return dbPodcasts.put(doc);
@@ -94,6 +112,7 @@ function addFeedItemButtons(item, read, listed) {
 	tempButton.textContent = read ? 'Mark as Unfinished' : 'Mark as Finished';
 	tempButton.title = tempButton.textContent;
 	tempButton.classList.add('feed-item__meta-button-finished');
+	item.parentNode.classList.toggle('finished', read);
 	buttonArea.appendChild(tempButton);
 
 	tempButton = document.createElement('button');
@@ -115,6 +134,11 @@ function addFeedButton(el, isSaved) {
 	if (typeof isSaved !== 'boolean') throw Error('Is saved needs to be boolean');
 
 	var classname = 'feed-item__meta-button-add-remove-to-my-podcasts';
+
+	var main = document.querySelector('main');
+	if (main) {
+		main.classList.toggle('starred', isSaved);
+	}
 
 	var button = el.querySelector('.' + classname);
 	if (button) {
@@ -188,6 +212,22 @@ function updateAllPodcastUI() {
 				addFeedButton(el, true);
 			});
 		});
+
+		(function () {
+			var title = document.querySelector('.feed-title');
+			var classname = 'feed-item__meta-button-mark-all-as-read';
+			if (title) {
+				var button = document.createElement('button');
+				button.addEventListener('click', markAllAsFinished);
+				button.classList.add(classname);
+				button.dataset.feedId = title.dataset.url;
+				var action = 'finish';
+				button.textContent = 'Mark All';
+				button.title = button.textContent;
+				button.dataset.action = action;
+				title.appendChild(button);
+			}
+		} ());
 
 		return finishedWith;
 	});

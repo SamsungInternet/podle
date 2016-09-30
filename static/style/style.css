@@ -71,9 +71,17 @@ main {
 	padding: 1em;
 	background: #FEFEEB;
 	border-bottom: 0.5rem solid #0CA5B0;
-	padding-bottom: 2e;
+	padding-bottom: 1.5em;
 	margin-bottom: 2em;
     box-shadow: 0 0 1em -0.5em #4E3F30;
+}
+
+.feed-item.finished {
+	opacity: 0.6;
+    height: 7em;
+    overflow: hidden;
+    margin-bottom: 0;
+    z-index: 0;
 }
 
 .feed-item__audio-player {
@@ -135,6 +143,16 @@ main {
 .feed-item__meta-button-add-remove-to-my-podcasts[data-action="remove"]:before,
 .feed-item__meta-button-add-to-list[data-action="unlist"]:before {
 	content: "\2605";
+}
+
+main .feed-item__meta-button-mark-all-as-read,
+main .items .feed-item__meta-button-finished {
+	display: none;
+}
+
+main.starred .feed-item__meta-button-mark-all-as-read,
+main.starred .items .feed-item__meta-button-finished {
+	display: inline-block;
 }
 
 .feed-item__meta-button-finished:before {
