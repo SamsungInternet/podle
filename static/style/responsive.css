@@ -18,3 +18,24 @@ header div {
     flex-grow: 1;
     text-align: right;
 }
+
+.index-content {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 600px) {
+    .index-content {
+        display: flex;
+        flex-direction: row;
+        flex-flow: wrap;
+    }
+    .index-content div {
+        flex-grow: 1;
+    }
+
+    main {
+        max-width: 1024px;
+        margin: auto;
+    }
+}
