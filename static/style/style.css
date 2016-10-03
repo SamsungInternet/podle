@@ -184,3 +184,11 @@ main.starred .items .feed-item__meta-button-finished {
 .feed-item__meta-button-area {
 	float: right;
 }
+
+header div form {
+	margin-top: 0.1em;
+}
+
+input[type="submit"] {
+	width: 5em;
+}

@@ -13,17 +13,6 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const csp = require('helmet-csp');
 const audioProxy = require('./lib/audio-proxy');
-const redisSplit = require('redis-url').parse(process.env.REDIS_URL);
-const cache = require('express-redis-cache')({
-	host: redisSplit.hostname, port: Number(redisSplit.port), auth_pass: redisSplit.password,
-    expire: {
-      '200': 5000,
-      '4xx': 10,
-      '403': 5000,
-      '5xx': 10,
-      'xxx': 1
-    }
-});
 
 app.set('json spaces', 2);
 app.use(helmet());
@@ -78,7 +67,7 @@ app.set('view engine', 'handlebars');
 
 app.get('/audioproxy/', audioProxy);
 
-app.get('/:version/search', cache.route(), function(req, res) {
+app.get('/:version/search', function(req, res) {
 	const shoudDebug = !!req.query.debug;
 	getSearch(req.query.term)
 		.then(function(result) {
@@ -89,6 +78,7 @@ app.get('/:version/search', cache.route(), function(req, res) {
 		.catch(function(err) {
 			res.status(400);
 			res.render('error', {
+				term: req.query.term,
 				message: err.message,
 				layout: req.params.version
 			});
@@ -140,14 +130,20 @@ app.get('/:version/feed', function(req, res) {
 	});
 });
 
-app.get('/:version', function(req, res) {
+app.use('/sw-no-push.js', express.static(__dirname + '/static/sw-no-push.js'));
+app.use('/sw-with-push.js', express.static(__dirname + '/static/sw-with-push.js'));
+
+app.get('/:version/', function(req, res, next) {
+	if (!req.params.version.match(/^v[0-9]+/)) {
+		return next();
+	}
 	res.render('index', {
 		layout: req.params.version
 	});
 });
 
 app.get('/', function(req, res) {
-	res.redirect('/v5/');
+	res.redirect('/v6/');
 });
 
 app.use(bodyParser.json({

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Podle {{#if title}}- {{ title }}{{else}}Podcasts{{/if}}</title>
+		<meta charset="utf-8">
+		<meta http-equiv="cleartype" content="on">
+		<meta name="MobileOptimized" content="width">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="HandheldFriendly" content="true">
+		<link rel="stylesheet" href="/static/style/style.css">
+		<link rel="stylesheet" href="/static/style/responsive.css">
+
+
+
+		<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=default,Array.prototype.includes" defer></script>
+		<script src="/static/scripts/third-party/pouchdb-6.0.5.min.js" defer></script>
+		<script src="/static/scripts/db.js" defer></script>
+		<script src="/static/scripts/ui.js" defer></script>
+		<script src="/static/scripts/sw1.js" defer></script>
+	</head>
+	<body>
+		{{> header }}
+		<main>{{{body}}}</main>
+	</body>
+</html>
