@@ -25,7 +25,7 @@ app.use(csp({
 		styleSrc: ['\'self\'', 'https://fonts.googleapis.com'],
 		fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
 		imgSrc: ['data:', 'https:'],
-		reportUri: '/report-violation',
+		// reportUri: '/api/report-violation',
 		frameAncestors: ['none'],
 
 		objectSrc: [], // An empty array allows nothing through
@@ -151,14 +151,13 @@ app.use(bodyParser.json({
 	type: ['json', 'application/csp-report']
 }));
 
-app.post('/sub', function (req, res) {
+app.post('/api/sub', function (req, res) {
 	const url = req.body.url;
 	const subscriptionId = req.body.subscriptionId;
 
 	if (!url || !subscriptionId) {
-		return res.status(400).render('error', {
-			message: 'Missing body items',
-			layout: req.params.version
+		return res.status(400).json({
+			message: 'Missing body items'
 		});
 	} else {
 		follow(subscriptionId, url)
@@ -173,7 +172,7 @@ app.post('/sub', function (req, res) {
 	}
 });
 
-app.post('/unsub', function (req, res) {
+app.post('/api/unsub', function (req, res) {
 	const url = req.body.url;
 	const subscriptionId = req.body.subscriptionId;
 
@@ -195,8 +194,8 @@ app.post('/unsub', function (req, res) {
 	}
 });
 
-app.post('/report-violation', function(req, res) {
-	if (req.body) {
+app.post('/api/report-violation', function(req, res) {
+	if (req.body && req.body['csp-report']) {
 		console.log('CSP Violation: ', req.body['csp-report']['blocked-uri'])
 	} else {
 		console.log('CSP Violation: No data received!')

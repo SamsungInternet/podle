@@ -7,8 +7,8 @@ var dbPodcasts = new PouchDB('podcastURLs');
 
 function updateSubscription(subscription) {
 	if (subscription.constructor === Array) {
-		return Promise.all(subscription.map(function () {
-			updateSubscription(subscription);
+		return Promise.all(subscription.map(function (s) {
+			updateSubscription(s);
 		}))
 	}
 
@@ -18,14 +18,27 @@ function updateSubscription(subscription) {
 	var subscriptionId = subscription.subscriptionId;
 	var unsubscribe = subscription.unsubscribe;
 
-	var url = unsubscribe ? '/unsub' : '/sub';
+	var endpoint = unsubscribe ? '/api/unsub' : '/api/sub';
+	var jsonHeader = new Headers({
+		'Content-Type': 'application/json',
+		'Accept': 'application/json'
+	});
 
-	return fetch(url, {
+	return fetch(endpoint, {
 		method: 'POST',
+		headers: jsonHeader,
 		body: JSON.stringify({
 			url: url,
-			subscriptionId: subscriptionId
+			subscriptionId: JSON.stringify(subscriptionId)
 		})
+	})
+	.then(function (response) {
+		if (!response.ok) {
+			return response.json().then(function (body) {
+				console.error(body);
+				throw Error('Bad Response');
+			});
+		}
 	});
 	// Make fetch request to update server
 }
@@ -55,7 +68,12 @@ if ('serviceWorker' in navigator) {
 
 				// Update server with correct info.
 				// fetch from local db and update those urls
-				return updateSubscription(arr[0].map(function (e) { return e.id;}));
+				return updateSubscription(arr[0].rows.map(function (e) {
+					return {
+						url: e.id,
+						subscriptionId: subscription,
+						unsubscribe: false
+					};}));
 			}
 		})
 		.catch(function (e) {
@@ -88,7 +106,7 @@ if ('serviceWorker' in navigator) {
 						// include network errors, and lacking gcm_sender_id and/or
 						// gcm_user_visible_only in the manifest.
 						console.error('Unable to subscribe to push.');
-						console.log(e);
+						console.log(e.message, e);
 					}
 				});
 		}

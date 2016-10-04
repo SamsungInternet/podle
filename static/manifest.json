@@ -14,7 +14,8 @@
   ],
   "start_url": "/v7/",
   "display": "standalone",
-  "gcm_sender_id": "90157766285",
+  "gcm_sender_id": "688501481129",
+  "fcm_sender_id": "688501481129",
   "background_color": "white",
   "theme_color": "#4E3F30"
 }
