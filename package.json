@@ -25,6 +25,7 @@
     "redis-streams": "^1.1.0",
     "redis-url": "^1.2.1",
     "request": "^2.75.0",
+    "web-push": "^3.0.0",
     "xml2js": "^0.4.17"
   },
   "engines": {

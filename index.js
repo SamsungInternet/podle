@@ -13,7 +13,9 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const csp = require('helmet-csp');
 const audioProxy = require('./lib/audio-proxy');
-const {follow, unFollow} = require('./lib/push-notifications');
+const {follow, unFollow, push} = require('./lib/push-notifications');
+const querystring = require('querystring');
+const URL = require('url');
 
 app.set('json spaces', 2);
 app.use(helmet());
@@ -151,6 +153,22 @@ app.use(bodyParser.json({
 	type: ['json', 'application/csp-report']
 }));
 
+function unfungleUrl(url) {
+
+	if (url.match(/^https?%3A%2F%2F/i)) {
+		url = decodeURIComponent(url);
+	}
+
+	url = URL.parse(url);
+	delete url.search;
+	url.query = querystring.parse(url.query);
+	url.query.format = 'xml';
+	url.query.fmt = 'xml';
+	url = URL.format(url);
+
+	return url;
+}
+
 app.post('/api/sub', function (req, res) {
 	const url = req.body.url;
 	const subscriptionId = req.body.subscriptionId;
@@ -160,10 +178,8 @@ app.post('/api/sub', function (req, res) {
 			message: 'Missing body items'
 		});
 	} else {
-		follow(subscriptionId, url)
+		follow(subscriptionId, unfungleUrl(url))
 			.then(() => res.status(200).json({ status: 'ok' }))
-			// .then(() => client.smembersAsync(keys.listOfUrlsToCheckKey))
-			// .then(members => console.log(members.map(a => a.toString())))
 			.catch(function(err) {
 				res.status(400).json({
 					message: err.message,
@@ -177,15 +193,30 @@ app.post('/api/unsub', function (req, res) {
 	const subscriptionId = req.body.subscriptionId;
 
 	if (!url || !subscriptionId) {
-		return res.status(400).render('error', {
-			message: 'Missing body items',
-			layout: req.params.version
+		return res.status(400).json({
+			message: 'Missing body items'
 		});
 	} else {
-		unFollow(subscriptionId, url)
+		unFollow(subscriptionId, unfungleUrl(url))
 			.then(() => res.status(200).json({ status: 'ok' }))
-			// .then(() => client.smembersAsync(keys.listOfUrlsToCheckKey))
-			// .then(members => console.log(members.map(a => a.toString())))
+			.catch(function(err) {
+				res.status(400).json({
+					message: err.message,
+				});
+			});
+	}
+});
+
+app.post('/api/push', function (req, res) {
+	const url = req.body.url;
+
+	if (!url) {
+		return res.status(400).json({
+			message: 'Missing body items'
+		});
+	} else {
+		push(unfungleUrl(url))
+			.then(() => res.status(200).json({ status: 'ok' }))
 			.catch(function(err) {
 				res.status(400).json({
 					message: err.message,

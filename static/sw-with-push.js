@@ -15,7 +15,6 @@
 importScripts('/static/scripts/third-party/sw-toolbox.js');
 importScripts('/static/scripts/sw-routing.js');
 
-
 self.addEventListener('notificationclick', function(event) {
 	event.notification.close();
 
