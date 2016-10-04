@@ -26,14 +26,38 @@ self.addEventListener('notificationclick', function(event) {
 		for (let i = 0; i < clientList.length; i++) {
 			const client = clientList[i];
 			if ('focus' in client) {
+				if (event.notification.data && event.notification.data.url) {
+					client.postMessage({
+						action: 'update',
+						url: event.notification.data
+					});
+				}
 				return client.focus();
 			}
 		}
-		if (clients.openWindow) return clients.openWindow('/');
+
+		// couldn't focus client so open a new window
+		if (clients.openWindow) {
+			if (event.notification.data && event.notification.data.url) {
+				return clients.openWindow('/v7/feed?url=' + encodeURIComponent(event.notification.data.url));
+			} else {
+				return clients.openWindow('/');
+			}
+		};
 	}));
 });
 
-self.addEventListener('push', function(event) {
+self.addEventListener('push', function (event) {
+	let message = 'One of your feeds has updated.';
+	let data = {};
+
+	if (event.data) {
+		data = event.data.json();
+		if (data.title) {
+			message = data.title + ' has been updated.';
+		}
+	}
+
 	if (!(self.Notification && self.Notification.permission === 'granted')) {
 		return;
 	}
@@ -43,8 +67,10 @@ self.addEventListener('push', function(event) {
 		return;
 	}
 
-	const noti = self.registration.showNotification('hello world', {
-		icon: 'https://podle.ada.is/static/icon192.png'
+	const noti = self.registration.showNotification('Podcast updated', {
+		icon: 'https://podle.ada.is/static/icon192.png',
+		data: data,
+		body: message
 	});
 
 	event.waitUntil(noti);
