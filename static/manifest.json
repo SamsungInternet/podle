@@ -1,0 +1,20 @@
+{
+  "name": "Podle",
+  "icons": [
+    {
+      "src": "/static/icon192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/icon192.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/v7/",
+  "display": "standalone",
+  "gcm_sender_id": "90157766285",
+  "background_color": "white",
+  "theme_color": "#4E3F30"
+}

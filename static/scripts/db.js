@@ -5,8 +5,8 @@
 var dbPodcasts = new PouchDB('podcastURLs');
 var dbPodcastItems = new PouchDB('podcastItems');
 
-var handleErr = function(e) {
-	console.log(e);
+var handleErr = function (e) {
+	console.log(e); // eslint-disable-line no-console
 }
 
 function markAllAsFinished(e) {

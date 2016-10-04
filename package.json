@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./"
   },
-  "author": "",
+  "author": "Ada Rose Edwards",
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.4.6",
@@ -15,6 +15,7 @@
     "express": "^4.14.0",
     "express-handlebars": "^3.0.0",
     "express-redis-cache": "^0.4.2",
+    "farmhash": "^1.2.1",
     "feedparser": "^1.1.5",
     "file-type": "^3.8.0",
     "helmet": "^2.2.0",

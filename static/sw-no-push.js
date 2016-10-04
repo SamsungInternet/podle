@@ -1,4 +1,4 @@
-/* global caches, Request, self, toolbox, importScripts */
+/* global caches, Request, self, importScripts */
 /* jshint browser:true */
 /* eslint-env es6 */
 'use strict';

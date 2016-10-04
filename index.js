@@ -13,6 +13,7 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const csp = require('helmet-csp');
 const audioProxy = require('./lib/audio-proxy');
+const {follow, unFollow} = require('./lib/push-notifications');
 
 app.set('json spaces', 2);
 app.use(helmet());
@@ -143,12 +144,56 @@ app.get('/:version/', function(req, res, next) {
 });
 
 app.get('/', function(req, res) {
-	res.redirect('/v6/');
+	res.redirect('/v7/');
 });
 
 app.use(bodyParser.json({
 	type: ['json', 'application/csp-report']
 }));
+
+app.post('/sub', function (req, res) {
+	const url = req.body.url;
+	const subscriptionId = req.body.subscriptionId;
+
+	if (!url || !subscriptionId) {
+		return res.status(400).render('error', {
+			message: 'Missing body items',
+			layout: req.params.version
+		});
+	} else {
+		follow(subscriptionId, url)
+			.then(() => res.status(200).json({ status: 'ok' }))
+			// .then(() => client.smembersAsync(keys.listOfUrlsToCheckKey))
+			// .then(members => console.log(members.map(a => a.toString())))
+			.catch(function(err) {
+				res.status(400).json({
+					message: err.message,
+				});
+			});
+	}
+});
+
+app.post('/unsub', function (req, res) {
+	const url = req.body.url;
+	const subscriptionId = req.body.subscriptionId;
+
+	if (!url || !subscriptionId) {
+		return res.status(400).render('error', {
+			message: 'Missing body items',
+			layout: req.params.version
+		});
+	} else {
+		unFollow(subscriptionId, url)
+			.then(() => res.status(200).json({ status: 'ok' }))
+			// .then(() => client.smembersAsync(keys.listOfUrlsToCheckKey))
+			// .then(members => console.log(members.map(a => a.toString())))
+			.catch(function(err) {
+				res.status(400).json({
+					message: err.message,
+				});
+			});
+	}
+});
 
 app.post('/report-violation', function(req, res) {
 	if (req.body) {
