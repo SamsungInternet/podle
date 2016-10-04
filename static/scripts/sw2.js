@@ -67,39 +67,39 @@ if ('serviceWorker' in navigator) {
 			return false;
 		});
 
-	function subscribe(url, unsubscribe) {
-		console.log('Subscribing');
+	window.addEventListener('load', function() {
 
-		swPromise
-			.then(function (reg) {
-				return reg.pushManager.subscribe({ userVisibleOnly: true })
-			})
-			.then(function (subscription) {
-				return updateSubscription({ subscriptionId: subscription, url: url, unsubscribe: !!unsubscribe });
-			})
-			.catch(function (e) {
-				if (Notification.permission === 'denied') {
-					console.warn('Permission for Notifications was denied');
-				} else {
+		function subscribe(url, unsubscribe) {
+			console.log((unsubscribe ? 'Unsubscribing' : 'Subscribing') + ' to ' + url);
 
-					// A problem occurred with the subscription; common reasons
-					// include network errors, and lacking gcm_sender_id and/or
-					// gcm_user_visible_only in the manifest.
-					console.error('Unable to subscribe to push.');
-					console.log(e);
-				}
-			});
-	}
-}
+			swPromise
+				.then(function (reg) {
+					return reg.pushManager.subscribe({ userVisibleOnly: true })
+				})
+				.then(function (subscription) {
+					return updateSubscription({ subscriptionId: subscription, url: url, unsubscribe: !!unsubscribe });
+				})
+				.catch(function (e) {
+					if (Notification.permission === 'denied') {
+						console.warn('Permission for Notifications was denied');
+					} else {
 
-window.addEventListener('load', function() {
+						// A problem occurred with the subscription; common reasons
+						// include network errors, and lacking gcm_sender_id and/or
+						// gcm_user_visible_only in the manifest.
+						console.error('Unable to subscribe to push.');
+						console.log(e);
+					}
+				});
+		}
 
-	dbPodcasts.changes({
-		since: 'now',
-		live: true,
-		include_docs: true
-	}).on('change', function (e) {
-		subscribe(e.id, e.deleted);
+		dbPodcasts.changes({
+			since: 'now',
+			live: true,
+			include_docs: true
+		}).on('change', function (e) {
+			subscribe(e.id, e.deleted);
+		});
+
 	});
-
-});
+}
