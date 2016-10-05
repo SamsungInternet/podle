@@ -13,7 +13,7 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const csp = require('helmet-csp');
 const audioProxy = require('./lib/audio-proxy');
-const {follow, unFollow, push} = require('./lib/push-notifications');
+const {follow, unFollow} = require('./lib/push-notifications');
 const querystring = require('querystring');
 const URL = require('url');
 
@@ -71,12 +71,12 @@ app.set('view engine', 'handlebars');
 app.get('/audioproxy/', audioProxy);
 
 app.get('/:version/search', function(req, res) {
-	const shoudDebug = !!req.query.debug;
+	const shouldDebug = !!req.query.debug;
 	getSearch(req.query.term)
 		.then(function(result) {
 			result.layout = req.params.version;
 			result.term = req.query.term;
-			res.render(shoudDebug ? 'search-debug' : 'search', result);
+			res.render(shouldDebug ? 'search-debug' : 'search', result);
 		})
 		.catch(function(err) {
 			res.status(400);
@@ -97,28 +97,28 @@ app.get('/:version/feed', function(req, res) {
 			url = decodeURIComponent(url);
 		}
 
-		return getRSSItem(url)
-			.then(function(items) {
-				const shoudDebug = !!req.query.debug;
-				const shoudJson = !!req.query.json;
+		const shouldDebug = !!req.query.debug;
+		const shoudJson = !!req.query.json;
+		return getRSSItem(unfungleUrl(url), shouldDebug || shoudJson)
+			.then(function(feedData) {
 
-				items.size = req.query.size || 'full';
-				items.url = url;
+				feedData.url = url;
 
-				items.items.forEach(item => {
+				feedData.items.forEach(item => {
 					if (item.enclosures && !item['media:content']) {
 						item['media:content'] = item.enclosures;
 					}
 				});
 
-				items.layout = req.params.version;
-				items.title = items.meta.title;
+				feedData.layout = req.params.version;
+				feedData.title = feedData.meta.title;
 				if (shoudJson) {
-					return res.json(items);
+					return res.json(feedData);
 				}
-				res.render(shoudDebug ? 'feed-debug' : 'feed', items);
+				res.render(shouldDebug ? 'feed-debug' : 'feed', feedData);
 			}, function(err) {
 				res.status(400);
+				console.log(err);
 				res.render('error', {
 					message: err.message,
 					url: url,
@@ -198,24 +198,6 @@ app.post('/api/unsub', function (req, res) {
 		});
 	} else {
 		unFollow(subscriptionId, unfungleUrl(url))
-			.then(() => res.status(200).json({ status: 'ok' }))
-			.catch(function(err) {
-				res.status(400).json({
-					message: err.message,
-				});
-			});
-	}
-});
-
-app.post('/api/push', function (req, res) {
-	const url = req.body.url;
-
-	if (!url) {
-		return res.status(400).json({
-			message: 'Missing body items'
-		});
-	} else {
-		push(unfungleUrl(url))
 			.then(() => res.status(200).json({ status: 'ok' }))
 			.catch(function(err) {
 				res.status(400).json({
