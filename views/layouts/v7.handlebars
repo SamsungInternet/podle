@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Podle {{#if title}}- {{ title }}{{else}}Podcasts{{/if}}</title>
+		<title>Podle {{#if title}}- {{ title }}{{else}}for Podcasts{{/if}}</title>
 		<meta charset="utf-8">
 		<meta http-equiv="cleartype" content="on">
 		<meta name="MobileOptimized" content="width">
@@ -19,6 +19,12 @@
 		<script src="/static/scripts/db.js" defer></script>
 		<script src="/static/scripts/ui.js" defer></script>
 		<script src="/static/scripts/sw2.js" defer></script>
+
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:site" content="@lady_ada_king" />
+		<meta name="twitter:title" content="Podle {{#if title}}- {{ title }}{{else}}for Podcasts{{/if}}" />
+		<meta name="twitter:description" content="Listen to podcasts with the Podle Web App." />
+		<meta name="twitter:image" content="https://podle.ada.is/static/icon512.png" />
 	</head>
 	<body>
 		{{> header }}
