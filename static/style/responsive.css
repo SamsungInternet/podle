@@ -4,6 +4,10 @@ html, body {
     max-width: 100vw;
 }
 
+header {
+    position: relative;
+}
+
 .items {
 	display: flex;
 	flex-direction: column;
@@ -14,14 +18,42 @@ audio {
 	max-width: 100%;
 }
 
-header div {
-    flex-grow: 1;
-    text-align: right;
-}
-
 .index-content {
     display: flex;
     flex-direction: column;
+}
+
+label[for="hamburger"] {
+    display: none;
+}
+
+@media (max-width: 600px) {
+
+    label[for="hamburger"] {
+        display: inline-block;
+    }
+
+    .hamburger:checked + .hamburger-menu {
+        clip: rect(auto auto 0px auto);
+    }
+
+    .hamburger-menu {
+        background: #0CA5B0;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        padding: 1em;
+        flex-grow: 1;
+        box-shadow: 0 0 1em rgba(0,0,0,0.2);
+        clip: rect(auto auto 8rem auto);
+        transition: clip 320ms ease;
+    }
+
+    .hamburger-menu input[type="submit"] {
+        background: #FEFEEB;
+        color: black;
+    }
 }
 
 @media (min-width: 600px) {

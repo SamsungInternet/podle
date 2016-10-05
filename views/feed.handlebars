@@ -1,5 +1,8 @@
 {{#meta}}
-	<h1 class="feed-title feed-detail" data-url="{{#encodeURIComponent}}{{{ ../url }}}{{/encodeURIComponent}}" data-name="{{ title }}">{{title}}</h1>
+	<h1 class="feed-title feed-detail" data-name="{{ title }}" data-url="{{#encodeURIComponent}}{{{ ../url }}}{{/encodeURIComponent}}">{{title}}</h1>
+	<div id="title_useful-buttons" data-url="{{#encodeURIComponent}}{{{ ../url }}}{{/encodeURIComponent}}" data-name="{{ title }}">
+		<a href="https://twitter.com/share" class="twitter-share-button" data-size="large" data-text="Check out {{title}} on Podle" data-via="sbrowserdevrel" data-related="lady_ada_king" data-dnt="true" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+	</div>
 	{{#if description}}
 		<p class="description">{{description}}</p>
 	{{/if}}
@@ -15,7 +18,7 @@
 		</div>
 		{{#media:content}}
 			<div class="feed-item__audio-player">
-				<span><a href="{{url}}" target="_blank" rel="noopener" rel="nofollow">{{../title}} [LINK]</a>
+				<span><a href="{{url}}" target="_blank" rel="noopener" rel="nofollow" title="Direct Download: {{../title}}">Download</a>
 					(<span class="filesize">{{#bytesToMegabytes}}{{filesize}}{{/bytesToMegabytes}}</span> {{type}})</span>
 				<audio src="/audioproxy?url={{#encodeURIComponent}}{{url}}{{/encodeURIComponent}}" controls preload="none">
 					<span><a href="{{url}}" target="_blank" rel="noopener" rel="nofollow">{{../title}}</a>

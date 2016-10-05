@@ -33,10 +33,7 @@ p:before {
 }
 
 header {
-	display: flex;
 	align-items: baseline;
-	justify-content: space-between;
-	flex-wrap: wrap;
 	padding-right: 2em;
 	margin: 0 -1rem;
 	padding: 1rem;
@@ -49,6 +46,10 @@ header {
     background-repeat: no-repeat;
     background-size: contain;
 	background-blend-mode: overlay;
+}
+
+header h1 {
+	flex-grow: 1;
 }
 
 header h1 a,
@@ -100,14 +101,15 @@ main {
 	color: white;
 }
 
-.feed-item__audio-player span {
+.feed-item__audio-player > span {
 	display: block;
 }
 
 .feed-item__audio-player a,
 .feed-item__audio-player a:visited,
 .feed-item__audio-player a:active {
-	color: white;
+	/*color: white;*/
+	text-decoration: underline;
 }
 
 .feed-item__audio-player audio {
@@ -191,10 +193,50 @@ main.starred .items .feed-item__meta-button-finished {
 	float: right;
 }
 
-header div form {
-	margin-top: 0.1em;
+#title_useful-buttons {
+	display: flex;
+	height: 28px;
+}
+
+#title_useful-buttons > * {
+	margin-right: 0.5em;
+}
+
+label {
+	font-size: 0.8rem;
+	margin-right: 0.5em;
+	line-height: 1.75rem;
+}
+
+button, input[type="submit"] {
+    border-radius: 5px;
+    border: 1px solid #0c787f;
+    background: #0CA5B0;
+    color: white;
+	height: 1.75rem;
+	font-size: 0.8rem;
+}
+
+input {
+    border-radius: 5px 0 0 5px;
+	height: 1.75rem;
+    border: 1px solid #0c787f;
+    padding: 0.5em;
 }
 
 input[type="submit"] {
+	border: none;
+    border-radius: 0 5px 5px 0;
 	width: 5em;
+}
+
+header div form {
+    display: flex;
+    justify-content: flex-end;
+	margin-top: 0.1em;
+}
+
+.hamburger {
+	visibility: hidden;
+	position: absolute;
 }

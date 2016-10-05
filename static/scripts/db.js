@@ -221,26 +221,26 @@ function updateAllPodcastUI() {
 		});
 
 		(function () {
-			var title = document.querySelector('.feed-title');
+			var titleButtonArea = document.getElementById('title_useful-buttons');
 			var classnameAllRead = 'feed-item__meta-button-mark-all-as-read';
 			var classnameFirstUnread = 'feed-item__meta-button-goto-first-unread';
-			if (title) {
+			if (titleButtonArea) {
 				var button = document.createElement('button');
 				button.addEventListener('click', markAllAsFinished);
 				button.classList.add(classnameAllRead);
-				button.dataset.feedId = title.dataset.url;
+				button.dataset.feedId = titleButtonArea.dataset.url;
 				var action = 'finish';
 				button.textContent = 'Mark All';
 				button.title = button.textContent;
 				button.dataset.action = action;
-				title.appendChild(button);
+				titleButtonArea.appendChild(button);
 
 				button = document.createElement('button');
 				button.addEventListener('click', goToFirstUnread);
 				button.classList.add(classnameFirstUnread);
-				button.textContent = 'Go to first unseen';
+				button.textContent = 'Goto First Item';
 				button.title = button.textContent;
-				title.appendChild(button);
+				titleButtonArea.appendChild(button);
 			}
 		} ());
 
