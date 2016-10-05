@@ -43,6 +43,12 @@ header {
 	background: #4E3F30;
 	border-bottom: 0.5rem solid #0CA5B0;
 	color: white;
+
+    background-image: url("/static/images/logo-white.svg");
+    background-position: right bottom;
+    background-repeat: no-repeat;
+    background-size: contain;
+	background-blend-mode: overlay;
 }
 
 header h1 a,

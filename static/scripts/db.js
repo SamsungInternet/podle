@@ -179,6 +179,13 @@ var safeString = (function () {
 	return safeString;
 } ());
 
+function goToFirstUnread() {
+	var item = Array.from(document.querySelectorAll('.feed-item:not(.finished)')).pop();
+	if (item) {
+		item.scrollIntoView();
+	}
+}
+
 function updateAllPodcastUI() {
 	return dbPodcasts.allDocs({
 		include_docs: true
@@ -215,16 +222,24 @@ function updateAllPodcastUI() {
 
 		(function () {
 			var title = document.querySelector('.feed-title');
-			var classname = 'feed-item__meta-button-mark-all-as-read';
+			var classnameAllRead = 'feed-item__meta-button-mark-all-as-read';
+			var classnameFirstUnread = 'feed-item__meta-button-goto-first-unread';
 			if (title) {
 				var button = document.createElement('button');
 				button.addEventListener('click', markAllAsFinished);
-				button.classList.add(classname);
+				button.classList.add(classnameAllRead);
 				button.dataset.feedId = title.dataset.url;
 				var action = 'finish';
 				button.textContent = 'Mark All';
 				button.title = button.textContent;
 				button.dataset.action = action;
+				title.appendChild(button);
+
+				button = document.createElement('button');
+				button.addEventListener('click', goToFirstUnread);
+				button.classList.add(classnameFirstUnread);
+				button.textContent = 'Go to first unseen';
+				button.title = button.textContent;
 				title.appendChild(button);
 			}
 		} ());

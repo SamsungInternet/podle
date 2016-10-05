@@ -38,4 +38,8 @@ header div {
         max-width: 1024px;
         margin: auto;
     }
+
+    header {
+	    padding-right: 7em;
+    }
 }

@@ -26,7 +26,7 @@ app.use(csp({
 		scriptSrc: ['\'self\'', '\'unsafe-inline\'', 'https://cdn.polyfill.io'],
 		styleSrc: ['\'self\'', 'https://fonts.googleapis.com'],
 		fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
-		imgSrc: ['data:', 'https:'],
+		imgSrc: ['\'self\'', 'data:', 'https:'],
 		// reportUri: '/api/report-violation',
 		frameAncestors: ['none'],
 
