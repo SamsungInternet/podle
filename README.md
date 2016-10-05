@@ -1,4 +1,6 @@
-# PODLY
+# PODLE
 
-Forked from: https://github.com/ftlabs/email-signatures-server/
+Detailed write up to come:
+
+## Architecture
 
