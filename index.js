@@ -116,7 +116,8 @@ app.get('/:version/feed', function(req, res) {
 					return res.json(feedData);
 				}
 				res.render(shouldDebug ? 'feed-debug' : 'feed', feedData);
-			}, function(err) {
+			})
+			.catch(function(err) {
 				res.status(400);
 				console.log(err);
 				res.render('error', {
