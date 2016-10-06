@@ -23,7 +23,7 @@ app.use(csp({
 	// Specify directives as normal.
 	directives: {
 		defaultSrc: ['\'self\'', 'http:', 'https:'],
-		scriptSrc: ['\'self\'', '\'unsafe-inline\'', 'https://cdn.polyfill.io', 'https://platform.twitter.com/widgets.js', 'https://ajax.googleapis.com/ajax/libs/webfont/'],
+		scriptSrc: ['\'self\'', '\'unsafe-inline\'', 'cdn.polyfill.io', 'platform.twitter.com', 'ajax.googleapis.com/ajax/libs/webfont/'],
 		styleSrc: ['\'self\'', 'fonts.googleapis.com'],
 		fontSrc: ['\'self\'', 'fonts.gstatic.com'],
 		imgSrc: ['\'self\'', 'data:', 'https:'],
