@@ -16,7 +16,7 @@ h1, h2 {
 
 .wf-raleway-n4-active h1,
 .wf-raleway-n4-active h2 {
-    font-family: raleway;
+    font-family: raleway, Helvetica, Arial, sans-serif;
 }
 
 header {
