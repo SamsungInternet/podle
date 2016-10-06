@@ -23,9 +23,9 @@ app.use(csp({
 	// Specify directives as normal.
 	directives: {
 		defaultSrc: ['\'self\'', 'http:', 'https:'],
-		scriptSrc: ['\'self\'', '\'unsafe-inline\'', 'https://cdn.polyfill.io', 'https://platform.twitter.com/widgets.js'],
-		styleSrc: ['\'self\'', 'https://fonts.googleapis.com'],
-		fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
+		scriptSrc: ['\'self\'', '\'unsafe-inline\'', 'https://cdn.polyfill.io', 'https://platform.twitter.com/widgets.js', 'https://ajax.googleapis.com/ajax/libs/webfont/'],
+		styleSrc: ['\'self\'', 'fonts.googleapis.com'],
+		fontSrc: ['\'self\'', 'fonts.gstatic.com'],
 		imgSrc: ['\'self\'', 'data:', 'https:'],
 		// reportUri: '/api/report-violation',
 		frameAncestors: ['none'],

@@ -126,7 +126,7 @@ main {
 }
 
 .feed-item__meta-title {
-	margin: 0.2em 0;
+	margin: 0.2em 0 0.5em 0;
 }
 
 .feed-item__meta time {
