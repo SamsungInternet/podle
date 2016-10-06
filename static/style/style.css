@@ -9,6 +9,10 @@ body {
 	padding: 0 1rem;
 	background: white;
 	margin: 0;
+
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 p {
@@ -64,6 +68,7 @@ main {
 	margin-top: 1em;
 	padding:  0 0.5rem;
 	padding-bottom: 2em;
+	flex-grow: 1;
 }
 
 .feed-title {

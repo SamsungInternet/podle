@@ -1,12 +1,13 @@
 <h2>Introduction</h2>
 
 <p>Podle is a podcast streaming service to allow the searching and playing of Podcasts in your browser!!</p>
+<p>Built by the <a href="https://twitter.com/sbrowserdevrel" target="_blank" rel="noopener">Samsung Internet Dev Rel team</a> to showcase good practises in progressive web apps.</p>
 
 {{#ifEq layout 'v1' }}
 	<p>
 		The goals of 'v1' is to demonstrate the site without CSS or JS. To show that it still is usable.
 		This allows the site to work where assets have failed to load or are unsupported by the user's browser.
-		It uses HTML5 tags such as <audio></audio> but accounts that they may not work by providing links back to the existing material.
+		It uses HTML5 tags such as &lt;audio&gt;&lt;/audio&gt; but accounts that they may not work by providing links back to the existing material.
 	</p>
 {{/ifEq}}
 
@@ -37,12 +38,6 @@
 {{#ifEq layout 'v6' }}
 	<p>
 		This adds a service worker for offline support.
-	</p>
-{{/ifEq}}
-
-{{#ifEq layout 'v6' }}
-	<p>
-		This adds push notifications.
 	</p>
 {{/ifEq}}
 
