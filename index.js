@@ -16,6 +16,9 @@ const audioProxy = require('./lib/audio-proxy');
 const {follow, unFollow} = require('./lib/push-notifications');
 const querystring = require('querystring');
 const URL = require('url');
+const domain = require('domain');
+const raygun = require('raygun');
+const raygunClient = new raygun.Client().init({ apiKey: 'Yzo/GzTraB2y8zVE92OPDg==' });
 
 app.set('json spaces', 2);
 app.use(helmet());
@@ -68,157 +71,168 @@ const hbs = exphbs.create({
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
-app.get('/audioproxy/', audioProxy);
+const d = domain.create();
 
-app.get('/:version/search', function(req, res) {
-	const shouldDebug = !!req.query.debug;
-	getSearch(req.query.term)
-		.then(function(result) {
-			result.layout = req.params.version;
-			result.term = req.query.term;
-			res.render(shouldDebug ? 'search-debug' : 'search', result);
-		})
-		.catch(function(err) {
-			res.status(400);
-			res.render('error', {
-				term: req.query.term,
-				message: err.message,
-				layout: req.params.version
-			});
-		});
+d.on('error', function (err) {
+	raygunClient.send(err);
+	console.error('Error firing to Raygun', err.message, err.stack);
+	process.exit(1);
 });
 
-app.get('/:version/feed', function(req, res) {
-	if (req.query.url) {
+d.run(function () {
 
-		// Parse and add format querystrings
-		let url = req.query.url;
+	app.get('/audioproxy/', audioProxy);
+
+	app.get('/:version/search', function (req, res) {
+		const shouldDebug = !!req.query.debug;
+		getSearch(req.query.term)
+			.then(function (result) {
+				result.layout = req.params.version;
+				result.term = req.query.term;
+				res.render(shouldDebug ? 'search-debug' : 'search', result);
+			})
+			.catch(function (err) {
+				res.status(400);
+				res.render('error', {
+					term: req.query.term,
+					message: err.message,
+					layout: req.params.version
+				});
+			});
+	});
+
+	app.get('/:version/feed', function (req, res) {
+		if (req.query.url) {
+
+			// Parse and add format querystrings
+			let url = req.query.url;
+			if (url.match(/^https?%3A%2F%2F/i)) {
+				url = decodeURIComponent(url);
+			}
+
+			const shouldDebug = !!req.query.debug;
+			const shoudJson = !!req.query.json;
+			return getRSSItem(unfungleUrl(url), shouldDebug || shoudJson)
+				.then(function (feedData) {
+
+					feedData.url = url;
+
+					feedData.items.forEach(item => {
+						if (item.enclosures && !item['media:content']) {
+							item['media:content'] = item.enclosures;
+						}
+					});
+
+					feedData.layout = req.params.version;
+					feedData.title = feedData.meta.title;
+					if (shoudJson) {
+						return res.json(feedData);
+					}
+					res.render(shouldDebug ? 'feed-debug' : 'feed', feedData);
+				})
+				.catch(function (err) {
+					res.status(400);
+					console.log(err);
+					res.render('error', {
+						message: err.message,
+						url: url,
+						layout: req.params.version
+					});
+				});
+		}
+		res.status(400);
+		res.render('error', {
+			message: 'Invalid RSS URL',
+			layout: req.params.version
+		});
+	});
+
+	app.use('/sw-no-push.js', express.static(__dirname + '/static/sw-no-push.js'));
+	app.use('/sw-with-push.js', express.static(__dirname + '/static/sw-with-push.js'));
+
+	app.get('/:version/', function (req, res, next) {
+		if (!req.params.version.match(/^v[0-9]+/)) {
+			return next();
+		}
+		res.render('index', {
+			layout: req.params.version
+		});
+	});
+
+	app.get('/', function (req, res) {
+		res.redirect('/v7/');
+	});
+
+	app.use(bodyParser.json({
+		type: ['json', 'application/csp-report']
+	}));
+
+	function unfungleUrl(url) {
+
 		if (url.match(/^https?%3A%2F%2F/i)) {
 			url = decodeURIComponent(url);
 		}
 
-		const shouldDebug = !!req.query.debug;
-		const shoudJson = !!req.query.json;
-		return getRSSItem(unfungleUrl(url), shouldDebug || shoudJson)
-			.then(function(feedData) {
+		url = URL.parse(url);
+		delete url.search;
+		url.query = querystring.parse(url.query);
+		url.query.format = 'xml';
+		url.query.fmt = 'xml';
+		url = URL.format(url);
 
-				feedData.url = url;
-
-				feedData.items.forEach(item => {
-					if (item.enclosures && !item['media:content']) {
-						item['media:content'] = item.enclosures;
-					}
-				});
-
-				feedData.layout = req.params.version;
-				feedData.title = feedData.meta.title;
-				if (shoudJson) {
-					return res.json(feedData);
-				}
-				res.render(shouldDebug ? 'feed-debug' : 'feed', feedData);
-			})
-			.catch(function(err) {
-				res.status(400);
-				console.log(err);
-				res.render('error', {
-					message: err.message,
-					url: url,
-					layout: req.params.version
-				});
-			});
+		return url;
 	}
-	res.status(400);
-	res.render('error', {
-		message: 'Invalid RSS URL',
-		layout: req.params.version
+
+	app.post('/api/sub', function (req, res) {
+		const url = req.body.url;
+		const subscriptionId = req.body.subscriptionId;
+
+		if (!url || !subscriptionId) {
+			return res.status(400).json({
+				message: 'Missing body items'
+			});
+		} else {
+			follow(subscriptionId, unfungleUrl(url))
+				.then(() => res.status(200).json({ status: 'ok' }))
+				.catch(function (err) {
+					res.status(400).json({
+						message: err.message,
+					});
+				});
+		}
 	});
-});
 
-app.use('/sw-no-push.js', express.static(__dirname + '/static/sw-no-push.js'));
-app.use('/sw-with-push.js', express.static(__dirname + '/static/sw-with-push.js'));
+	app.post('/api/unsub', function (req, res) {
+		const url = req.body.url;
+		const subscriptionId = req.body.subscriptionId;
 
-app.get('/:version/', function(req, res, next) {
-	if (!req.params.version.match(/^v[0-9]+/)) {
-		return next();
-	}
-	res.render('index', {
-		layout: req.params.version
+		if (!url || !subscriptionId) {
+			return res.status(400).json({
+				message: 'Missing body items'
+			});
+		} else {
+			unFollow(subscriptionId, unfungleUrl(url))
+				.then(() => res.status(200).json({ status: 'ok' }))
+				.catch(function (err) {
+					res.status(400).json({
+						message: err.message,
+					});
+				});
+		}
 	});
+
+	app.post('/api/report-violation', function (req, res) {
+		if (req.body && req.body['csp-report']) {
+			console.log('CSP Violation: ', req.body['csp-report']['blocked-uri'])
+		} else {
+			console.log('CSP Violation: No data received!')
+		}
+		res.status(204).end()
+	});
+
+	app.use('/static', express.static(__dirname + '/static', {
+		maxAge: 3600 * 1000 * 24
+	}));
+
+	app.listen(process.env.PORT || 3000);
 });
-
-app.get('/', function(req, res) {
-	res.redirect('/v7/');
-});
-
-app.use(bodyParser.json({
-	type: ['json', 'application/csp-report']
-}));
-
-function unfungleUrl(url) {
-
-	if (url.match(/^https?%3A%2F%2F/i)) {
-		url = decodeURIComponent(url);
-	}
-
-	url = URL.parse(url);
-	delete url.search;
-	url.query = querystring.parse(url.query);
-	url.query.format = 'xml';
-	url.query.fmt = 'xml';
-	url = URL.format(url);
-
-	return url;
-}
-
-app.post('/api/sub', function (req, res) {
-	const url = req.body.url;
-	const subscriptionId = req.body.subscriptionId;
-
-	if (!url || !subscriptionId) {
-		return res.status(400).json({
-			message: 'Missing body items'
-		});
-	} else {
-		follow(subscriptionId, unfungleUrl(url))
-			.then(() => res.status(200).json({ status: 'ok' }))
-			.catch(function(err) {
-				res.status(400).json({
-					message: err.message,
-				});
-			});
-	}
-});
-
-app.post('/api/unsub', function (req, res) {
-	const url = req.body.url;
-	const subscriptionId = req.body.subscriptionId;
-
-	if (!url || !subscriptionId) {
-		return res.status(400).json({
-			message: 'Missing body items'
-		});
-	} else {
-		unFollow(subscriptionId, unfungleUrl(url))
-			.then(() => res.status(200).json({ status: 'ok' }))
-			.catch(function(err) {
-				res.status(400).json({
-					message: err.message,
-				});
-			});
-	}
-});
-
-app.post('/api/report-violation', function(req, res) {
-	if (req.body && req.body['csp-report']) {
-		console.log('CSP Violation: ', req.body['csp-report']['blocked-uri'])
-	} else {
-		console.log('CSP Violation: No data received!')
-	}
-	res.status(204).end()
-});
-
-app.use('/static', express.static(__dirname + '/static', {
-	maxAge: 3600*1000*24
-}));
-
-app.listen(process.env.PORT || 3000);
