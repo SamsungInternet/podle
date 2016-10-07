@@ -8,6 +8,7 @@ const express = require('express');
 const exphbs = require('express-handlebars');
 const app = express();
 const getRSSItem = require('./lib/get-rss-item');
+const getSearchLegacy = require('./lib/search-legacy');
 const getSearch = require('./lib/search');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
@@ -82,6 +83,24 @@ d.on('error', function (err) {
 d.run(function () {
 
 	app.get('/audioproxy/', audioProxy);
+
+	app.get('/:version/search-legacy', function (req, res) {
+		const shouldDebug = !!req.query.debug;
+		getSearchLegacy(req.query.term)
+			.then(function (result) {
+				result.layout = req.params.version;
+				result.term = req.query.term;
+				res.render(shouldDebug ? 'search-debug' : 'search', result);
+			})
+			.catch(function (err) {
+				res.status(400);
+				res.render('error', {
+					term: req.query.term,
+					message: err.message,
+					layout: req.params.version
+				});
+			});
+	});
 
 	app.get('/:version/search', function (req, res) {
 		const shouldDebug = !!req.query.debug;
