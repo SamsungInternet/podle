@@ -1,4 +1,4 @@
-/* global caches, Request, self, toolbox, importScripts */
+/* global caches, Request, self, toolbox */
 /* jshint browser:true */
 /* eslint-env es6 */
 'use strict';
@@ -17,11 +17,29 @@ self.addEventListener('fetch', function (event) {
 		// handle stream
 		return;
 	}
+
+	const url = (new URL(request.url));
+	if (url.pathname === '/audioproxy') {
+		return;
+	}
+
+	if (url.pathname === '/audioproxycache') {
+		if (self.cacheAndNotifyDoNotSave) {
+			const responsePromise = self.cacheAndNotifyDoNotSave(request);
+			event.waitUntil(responsePromise)
+			event.respondWith(responsePromise);
+		}
+	}
+
 	if (request.url.match(/data:/i)) {
 		// handle data uri
 		return;
 	}
-	event.respondWith(handler(request, [], {
+
+	const responsePromise = handler(request, [], {
 		networkTimeoutSeconds: 3
-	}));
+	});
+
+	event.waitUntil(responsePromise)
+	event.respondWith(responsePromise);
 });

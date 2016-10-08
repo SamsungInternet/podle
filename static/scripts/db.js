@@ -283,32 +283,29 @@ function updatePodcastItemsUI(readItems) {
 	});
 }
 
-window.addEventListener('load', function() {
-
-	dbPodcastItems.changes({
-		since: 'now',
-		live: true
-	}).on('change', function (e) {
-		Array.from(document.querySelectorAll('.feed-item-detail[data-feed-item-id="' + safeString(e.id) + '"]'))
-			.forEach(function (target) {
-				addFeedItemButtons(target, undefined, !e.deleted);
-			});
-	});
-
-	dbPodcasts.changes({
-		since: 'now',
-		live: true,
-		include_docs: true
-	}).on('change', function (e) {
-		Array.from(document.querySelectorAll('.feed-detail[data-url="' + safeString(e.id) + '"]'))
-			.forEach(function (target) {
-				addFeedButton(target, !e.deleted);
-			});
-		Array.from(document.querySelectorAll('.feed-item-detail[data-feed="' + safeString(e.id) + '"]'))
-			.forEach(function (target) {
-				addFeedItemButtons(target, e.doc.read.indexOf(target.dataset.feedItemId) !== -1, undefined);
-			});
-	});
-
-	updateAllPodcastUI().then(updatePodcastItemsUI);
+dbPodcastItems.changes({
+	since: 'now',
+	live: true
+}).on('change', function (e) {
+	Array.from(document.querySelectorAll('.feed-item-detail[data-feed-item-id="' + safeString(e.id) + '"]'))
+		.forEach(function (target) {
+			addFeedItemButtons(target, undefined, !e.deleted);
+		});
 });
+
+dbPodcasts.changes({
+	since: 'now',
+	live: true,
+	include_docs: true
+}).on('change', function (e) {
+	Array.from(document.querySelectorAll('.feed-detail[data-url="' + safeString(e.id) + '"]'))
+		.forEach(function (target) {
+			addFeedButton(target, !e.deleted);
+		});
+	Array.from(document.querySelectorAll('.feed-item-detail[data-feed="' + safeString(e.id) + '"]'))
+		.forEach(function (target) {
+			addFeedItemButtons(target, e.doc.read.indexOf(target.dataset.feedItemId) !== -1, undefined);
+		});
+});
+
+updateAllPodcastUI().then(updatePodcastItemsUI);

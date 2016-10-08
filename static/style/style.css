@@ -26,6 +26,13 @@ a, a:visited, a:active {
 	text-decoration: none;
 }
 
+blockquote {
+	margin: 0.1em 0.1em 0.1em 0.5em;
+    border-bottom: 0.5px solid #0CA5B0;
+    border-left: 3px solid #0CA5B0;
+    padding-left: 0.5em;
+}
+
 /**
 	Garuntee minimum paragraph widths around floats
 */

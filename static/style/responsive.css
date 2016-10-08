@@ -1,7 +1,6 @@
 html,
 body {
     box-sizing: content-box;
-    overflow-x: hidden;
     max-width: 100vw;
 }
 
@@ -40,6 +39,16 @@ audio {
 
 label[for="hamburger"] {
     display: none;
+}
+
+img {
+    max-width: 100%;
+}
+
+.feed-item {
+    max-width: 100%;
+    word-break: break-all;
+    word-break: break-word;
 }
 
 @media (max-width: 600px) {
