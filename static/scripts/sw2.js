@@ -85,7 +85,7 @@ if ('serviceWorker' in navigator) {
 			return false;
 		});
 
-	window.addEventListener('load', function() {
+	(function () {
 
 		function subscribe(url, unsubscribe) {
 			console.log((unsubscribe ? 'Unsubscribing' : 'Subscribing') + ' to ' + url);
@@ -119,5 +119,16 @@ if ('serviceWorker' in navigator) {
 			subscribe(e.id, e.deleted);
 		});
 
-	});
+		dbPodcasts.allDocs({
+			include_docs: true
+		}).then(function(result) {
+
+			if (result.total_rows) {
+				result.rows.forEach(function (row) {
+					subscribe(row.id);
+				});
+			}
+		});
+
+	}());
 }

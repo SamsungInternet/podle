@@ -23,6 +23,12 @@ self.addEventListener('fetch', function (event) {
 		return;
 	}
 
+	// Let the api routes not be cached.
+	// Ideally store for later on fail.
+	if (url.pathname === '/sub' || url.pathname === '/unsub') {
+		return;
+	}
+
 	if (url.pathname === '/audioproxycache') {
 		if (self.cacheAndNotifyDoNotSave) {
 			const responsePromise = self.cacheAndNotifyDoNotSave(request);
