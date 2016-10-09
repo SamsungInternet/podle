@@ -12,6 +12,9 @@
 self.addEventListener('fetch', function (event) {
 	const request = event.request;
 	const handler = (request.url.match(/^http:\/\/localhost/) && location.protocol === 'http:' || location.hostname === 'localhost') ? toolbox.networkFirst : toolbox.fastest;
+	const options = {
+		networkTimeoutSeconds: 3
+	};
 
 	if (request.url.match(/(\.mp4|\.webm|\.avi|\.wmv|\.m4v|\.mp3|\.ogg|\.wma)$/i)) {
 		// handle stream
@@ -29,11 +32,41 @@ self.addEventListener('fetch', function (event) {
 		return;
 	}
 
+	if (url.pathname === '/v7/feed' && url.search.match(/\&cb=/)) {
+		const origUrl = request.url.replace(/&cb=[^&]*/gi, '');
+		const responsePromise = Promise.all([
+			fetch(request),
+			caches.open('push-notification-page-cache')
+		])
+		.then(function([response, cache]) {
+			if (!response.ok) {
+				throw new TypeError('bad response status');
+			}
+			return cache.put(origUrl, response);
+		})
+		.then(function () {
+
+			const headers = new Headers();
+			headers.set('Content-Type', 'text/html');
+			headers.set('Location', origUrl);
+
+			return new Response(new Blob(), {
+				'status': 301,
+				'statusText': 'redirect',
+				'headers': headers
+			})
+		});
+		event.waitUntil(responsePromise)
+		event.respondWith(responsePromise);
+		return;
+	}
+
 	if (url.pathname === '/audioproxycache') {
 		if (self.cacheAndNotifyDoNotSave) {
 			const responsePromise = self.cacheAndNotifyDoNotSave(request);
 			event.waitUntil(responsePromise)
 			event.respondWith(responsePromise);
+			return;
 		}
 	}
 
@@ -42,9 +75,7 @@ self.addEventListener('fetch', function (event) {
 		return;
 	}
 
-	const responsePromise = handler(request, [], {
-		networkTimeoutSeconds: 3
-	});
+	const responsePromise = handler(request, [], options);
 
 	event.waitUntil(responsePromise)
 	event.respondWith(responsePromise);

@@ -131,7 +131,8 @@ d.run(function () {
 
 			const shouldDebug = !!req.query.debug;
 			const shoudJson = !!req.query.json;
-			return getRSSItem(unfungleUrl(url), shouldDebug || shoudJson)
+			const cacheBust = !!req.query.cb;
+			return getRSSItem(unfungleUrl(url), shouldDebug || shoudJson || cacheBust)
 				.then(function (feedData) {
 
 					feedData.url = url;
@@ -179,7 +180,15 @@ d.run(function () {
 	});
 
 	app.get('/', function (req, res) {
-		res.redirect('/v7/');
+		res.redirect('/v7' + req.url);
+	});
+
+	app.get('/feed', function (req, res) {
+		res.redirect('/v7' + req.url);
+	});
+
+	app.get('/search', function (req, res) {
+		res.redirect('/v7' + req.url);
 	});
 
 	app.use(bodyParser.json({

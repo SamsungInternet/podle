@@ -241,6 +241,15 @@ function updateAllPodcastUI() {
 				button.textContent = 'Goto First Item';
 				button.title = button.textContent;
 				titleButtonArea.appendChild(button);
+
+				button = document.createElement('button');
+				button.addEventListener('click', function () {
+					location.search = location.search + '&cb=' + Date.now();
+				});
+				button.classList.add(classnameFirstUnread);
+				button.textContent = 'Check for updates';
+				button.title = button.textContent;
+				titleButtonArea.appendChild(button);
 			}
 		} ());
 

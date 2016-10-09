@@ -55,80 +55,69 @@ if ('serviceWorker' in navigator) {
 			return false;
 		})
 
-	swPromise
-		.then(function (reg) {
-			return Promise.all([
-				dbPodcasts.allDocs(),
-				reg.pushManager.getSubscription()
-			])
-		})
-		.then(function (arr) {
-			var subscription = arr[1];
-			if (subscription) {
+	// Once per session update all the podcast subscriptions
+	if (!sessionStorage.getItem('needs-update')) {
+		sessionStorage.setItem('needs-update', '1');
+		swPromise
+			.then(function (reg) {
+				return Promise.all([
+					dbPodcasts.allDocs(),
+					reg.pushManager.getSubscription()
+				])
+			})
+			.then(function (arr) {
+				var subscription = arr[1];
+				if (subscription) {
 
-				// Update server with correct info.
-				// fetch from local db and update those urls
-				return updateSubscription(arr[0].rows.map(function (e) {
-					return {
-						url: e.id,
-						subscriptionId: subscription,
-						unsubscribe: false
-					};}));
-			}
-		})
-		.catch(function (e) {
+					// Update server with correct info.
+					// fetch from local db and update those urls
+					return updateSubscription(arr[0].rows.map(function (e) {
+						return {
+							url: e.id,
+							subscriptionId: subscription,
+							unsubscribe: false
+						};}));
+				}
+			})
+			.catch(function (e) {
 
-			// Service workers not supported.
-			console.log('service workers/push notifications not supported.')
-			console.log(e);
+				// Service workers not supported.
+				console.log('service workers/push notifications not supported.')
+				console.log(e);
 
-			return false;
-		});
+				return false;
+			});
+	}
 
-	(function () {
+	function subscribe(url, unsubscribe) {
+		console.log((unsubscribe ? 'Unsubscribing' : 'Subscribing') + ' to ' + url);
 
-		function subscribe(url, unsubscribe) {
-			console.log((unsubscribe ? 'Unsubscribing' : 'Subscribing') + ' to ' + url);
+		swPromise
+			.then(function (reg) {
+				return reg.pushManager.subscribe({ userVisibleOnly: true })
+			})
+			.then(function (subscription) {
+				return updateSubscription({ subscriptionId: subscription, url: url, unsubscribe: !!unsubscribe });
+			})
+			.catch(function (e) {
+				if (Notification.permission === 'denied') {
+					console.warn('Permission for Notifications was denied');
+				} else {
 
-			swPromise
-				.then(function (reg) {
-					return reg.pushManager.subscribe({ userVisibleOnly: true })
-				})
-				.then(function (subscription) {
-					return updateSubscription({ subscriptionId: subscription, url: url, unsubscribe: !!unsubscribe });
-				})
-				.catch(function (e) {
-					if (Notification.permission === 'denied') {
-						console.warn('Permission for Notifications was denied');
-					} else {
+					// A problem occurred with the subscription; common reasons
+					// include network errors, and lacking gcm_sender_id and/or
+					// gcm_user_visible_only in the manifest.
+					console.error('Unable to subscribe to push.');
+					console.log(e.message, e);
+				}
+			});
+	}
 
-						// A problem occurred with the subscription; common reasons
-						// include network errors, and lacking gcm_sender_id and/or
-						// gcm_user_visible_only in the manifest.
-						console.error('Unable to subscribe to push.');
-						console.log(e.message, e);
-					}
-				});
-		}
-
-		dbPodcasts.changes({
-			since: 'now',
-			live: true,
-			include_docs: true
-		}).on('change', function (e) {
-			subscribe(e.id, e.deleted);
-		});
-
-		dbPodcasts.allDocs({
-			include_docs: true
-		}).then(function(result) {
-
-			if (result.total_rows) {
-				result.rows.forEach(function (row) {
-					subscribe(row.id);
-				});
-			}
-		});
-
-	}());
+	dbPodcasts.changes({
+		since: 'now',
+		live: true,
+		include_docs: true
+	}).on('change', function (e) {
+		subscribe(e.id, e.deleted);
+	});
 }
