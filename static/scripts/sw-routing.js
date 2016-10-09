@@ -11,7 +11,7 @@
 
 self.addEventListener('fetch', function (event) {
 	const request = event.request;
-	const handler = (request.url.match(/^http:\/\/localhost/) && location.protocol === 'http:' || location.hostname === 'localhost') ? toolbox.networkFirst : toolbox.fastest;
+	let handler = (request.url.match(/^http:\/\/localhost/) && location.protocol === 'http:' || location.hostname === 'localhost') ? toolbox.networkFirst : toolbox.fastest;
 	const options = {
 		networkTimeoutSeconds: 3
 	};
@@ -22,8 +22,22 @@ self.addEventListener('fetch', function (event) {
 	}
 
 	const url = (new URL(request.url));
+
+	// Straight to network here
+	// once the /audioproxycache endpoint is finished
+	// this will need to check for cache
 	if (url.pathname === '/audioproxy') {
 		return;
+	}
+
+	// In this case do the pushnotification cachy thing
+	if (url.pathname === '/audioproxycache') {
+		if (self.cacheAndNotifyDoNotSave) {
+			const responsePromise = self.cacheAndNotifyDoNotSave(request);
+			event.waitUntil(responsePromise)
+			event.respondWith(responsePromise);
+			return;
+		}
 	}
 
 	// Let the api routes not be cached.
@@ -32,6 +46,14 @@ self.addEventListener('fetch', function (event) {
 		return;
 	}
 
+	// Ideally this would do cacheFirst then update the page if the
+	// page has been updated
+	if (url.pathname === '/v7/feed') {
+		handler = toolbox.networkFirst;
+	}
+
+	// If it is CB then fetch with the cache buster query but store it In
+	// the cache for the original url
 	if (url.pathname === '/v7/feed' && url.search.match(/\&cb=/)) {
 		const origUrl = request.url.replace(/&cb=[^&]*/gi, '');
 		const responsePromise = Promise.all([
@@ -61,15 +83,7 @@ self.addEventListener('fetch', function (event) {
 		return;
 	}
 
-	if (url.pathname === '/audioproxycache') {
-		if (self.cacheAndNotifyDoNotSave) {
-			const responsePromise = self.cacheAndNotifyDoNotSave(request);
-			event.waitUntil(responsePromise)
-			event.respondWith(responsePromise);
-			return;
-		}
-	}
-
+	// Let data urls being handled normally
 	if (request.url.match(/data:/i)) {
 		// handle data uri
 		return;
