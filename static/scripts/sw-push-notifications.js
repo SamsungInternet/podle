@@ -48,8 +48,6 @@ function cache(url) {
     });
 }
 
-self.cacheUrl = cache;
-
 function getPodleApiForFeed(url) {
 	return ('/v7/feed?url=' + encodeURIComponent(url));
 }
