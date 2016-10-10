@@ -244,7 +244,7 @@ function updateAllPodcastUI() {
 
 				button = document.createElement('button');
 				button.addEventListener('click', function () {
-					location.search = location.search + '&cb=' + Date.now();
+					location.search = location.search.replace(/&cb=[^&]*/gi, '') + '&cb=' + Date.now();
 				});
 				button.classList.add(classnameFirstUnread);
 				button.textContent = 'Check for updates';

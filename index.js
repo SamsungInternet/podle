@@ -251,11 +251,11 @@ d.run(function () {
 
 	app.post('/api/report-violation', function (req, res) {
 		if (req.body && req.body['csp-report']) {
-			console.log('CSP Violation: ', req.body['csp-report']['blocked-uri'])
+			console.log('CSP Violation: ', req.body['csp-report']['blocked-uri']);
 		} else {
-			console.log('CSP Violation: No data received!')
+			console.log('CSP Violation: No data received!');
 		}
-		res.status(204).end()
+		res.status(204).end();
 	});
 
 	app.use('/static', express.static(__dirname + '/static', {
