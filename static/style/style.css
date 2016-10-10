@@ -220,6 +220,14 @@ label {
 	line-height: 1.75rem;
 }
 
+.banner {
+	padding: 0.5em 0;
+	background: #FEFEEB;
+	text-align: center;
+	margin: 0 -1rem;
+	cursor: pointer;
+}
+
 button, input[type="submit"] {
     border-radius: 5px;
     border: 1px solid #0c787f;

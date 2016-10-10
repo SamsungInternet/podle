@@ -43,6 +43,18 @@ function updateSubscription(subscription) {
 	// Make fetch request to update server
 }
 
+function showSubscribeButton() {
+	var p = document.createElement('div');
+	p.textContent = 'Subscribe to push notifcations';
+	p.classList.add('banner');
+	document.querySelector('header').before(p);
+	return new Promise(function (resolve) {
+		p.addEventListener('click', function () {
+			resolve(p);
+		});
+	});
+}
+
 // Load the service worker which does not have push notification support.
 if ('serviceWorker' in navigator) {
 	swPromise = navigator.serviceWorker.register('/sw-with-push.js', { scope: '/' })
@@ -68,16 +80,45 @@ if ('serviceWorker' in navigator) {
 			.then(function (arr) {
 				var subscription = arr[1];
 				if (subscription) {
+					return {
+						subscriptionId: subscription,
+						rows: arr[0].rows
+					}
+				} else if (arr[0].total_rows) {
 
-					// Update server with correct info.
-					// fetch from local db and update those urls
-					return updateSubscription(arr[0].rows.map(function (e) {
-						return {
-							url: e.id,
-							subscriptionId: subscription,
-							unsubscribe: false
-						};}));
+					// Has faved items but no subscription
+					// reask for permission.
+					return swPromise
+						.then(function (reg) {
+							return showSubscribeButton()
+								.then(function (button) {
+									button.remove();
+								})
+								.then(function () {
+									return reg.pushManager.subscribe({ userVisibleOnly: true })
+								})
+								.then(function (subscriptionId) {
+									return {
+										subscriptionId: subscriptionId,
+										rows: arr[0].rows
+									};
+								})
+						});
 				}
+			})
+			.then(function (o) {
+				var subscriptionId = o.subscriptionId;
+				var rows = o.rows;
+
+				// Update server with correct info.
+				// fetch from local db and update those urls
+				return updateSubscription(rows.map(function (e) {
+					return {
+						url: e.id,
+						subscriptionId: subscriptionId,
+						unsubscribe: false
+					};
+				}));
 			})
 			.catch(function (e) {
 
