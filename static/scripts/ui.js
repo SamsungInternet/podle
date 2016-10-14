@@ -45,6 +45,10 @@ var parse =function getEl(body) {
 var replaceEl = curry2(function replaceEl(oldEl, newEl) {
 	oldEl.innerHTML = '';
 	while (newEl.firstChild) {
+		if (newEl.firstChild.tagName === 'script') {
+			newEl.removeChild(newEl.firstChild);
+			return;
+		}
 		oldEl.appendChild(newEl.firstChild);
 	}
 	newEl.remove();
@@ -61,38 +65,39 @@ function isLocal(url) {
 var loading = false;
 function loadPage(url, replace, backwards) {
 	if (!replace && url === window.location.href || loading) return;
-	var backwards = backwards || (replace === true);
+	var backwards = backwards || (replace === true) || window.location.href.indexOf(url) === 0;
 	var titleEl = document.getElementsByTagName('title')[0];
+
 	var oldMainEl = document.querySelector('main:not([data-used])');
 	var newMainEl = document.createElement('main');
-	newMainEl.innerHTML = url.match(/\/feed\?url=/) ? DUMMY_CONTENT : LOADING_SPINNER;
-	oldMainEl.after(newMainEl);
-
+	newMainEl.style.transform = 'translateX(' + (backwards ? '-' : '') + '100vw)';
+	oldMainEl.style.transform = 'translateX(' + (!backwards ? '-' : '') + '100vw)';
+	
 	loading = true;
 	document.body.classList.add('loading');
 
-	newMainEl.style.transform = 'translateX(' + (backwards ? '-' : '') + '100vw)';
 	newMainEl.style.position = 'absolute';
 	newMainEl.style.left = oldMainEl.offsetLeft + 'px';
 	newMainEl.style.top = oldMainEl.offsetTop + 'px';
 	newMainEl.style.width = oldMainEl.offsetWidth + 'px';
-	newMainEl.style.height = oldMainEl.offsetHeight + 'px';
 
-	oldMainEl.getBoundingClientRect();
-	newMainEl.style.transform = '';
-	oldMainEl.style.transform = 'translateX(' + (!backwards ? '-' : '') + '100vw)';
+	newMainEl.innerHTML = url.match(/\/feed\?url=/) ? DUMMY_CONTENT : LOADING_SPINNER;
+	oldMainEl.after(newMainEl);
+	
 	oldMainEl.dataset.used = '1';
+	
+	// Slide it back into position
+	setTimeout(function () {
+		newMainEl.style.transform = '';
+	}, 60);
 
-	// flush again
-	oldMainEl.getBoundingClientRect();
 	setTimeout(function () {
 		oldMainEl.remove();
 		newMainEl.style.position = '';
 		newMainEl.style.left = '';
 		newMainEl.style.top = '';
 		newMainEl.style.width = '';
-		newMainEl.style.height = '';
-	}, 1000);
+	}, 1060);
 
 	return fetch(url)
 		// .then(isOk)
