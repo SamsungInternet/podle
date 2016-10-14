@@ -28,6 +28,7 @@ p {
 
 header {
     position: relative;
+    z-index: 99;
 }
 
 .items {
