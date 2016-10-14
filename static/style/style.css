@@ -10,9 +10,9 @@ body {
 	background: white;
 	margin: 0;
 
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
 }
 
 body .filler {
@@ -23,7 +23,7 @@ body .filler {
 
 p {
 	line-height: 1.5em;
-    max-width: 40em;
+	max-width: 40em;
 	text-rendering: optimizeLegibility;
 }
 
@@ -34,19 +34,19 @@ a, a:visited, a:active {
 
 blockquote {
 	margin: 0.1em 0.1em 0.1em 0.5em;
-    border-bottom: 0.5px solid #0CA5B0;
-    border-left: 3px solid #0CA5B0;
-    padding-left: 0.5em;
+	border-bottom: 0.5px solid #0CA5B0;
+	border-left: 3px solid #0CA5B0;
+	padding-left: 0.5em;
 }
 
 /**
 	Garuntee minimum paragraph widths around floats
 */
-p:before {
-    content: "";
-    width: 12em;
-    display: block;
-    overflow: hidden;
+	p:before {
+	content: "";
+	width: 12em;
+	display: block;
+	overflow: hidden;
 }
 
 header {
@@ -58,10 +58,10 @@ header {
 	border-bottom: 0.5rem solid #0CA5B0;
 	color: white;
 
-    background-image: url("/static/images/logo-white.svg");
-    background-position: right bottom;
-    background-repeat: no-repeat;
-    background-size: contain;
+	background-image: url("/static/images/logo-white.svg");
+	background-position: right bottom;
+	background-repeat: no-repeat;
+	background-size: contain;
 	background-blend-mode: overlay;
 }
 
@@ -78,8 +78,7 @@ header h1 a:active {
 
 main {
 	background: white;
-	margin-top: 1em;
-	padding:  0 0.5rem;
+	padding:  0.3rem 0.5rem;
 	padding-bottom: 2em;
 	flex-grow: 1;
 }
@@ -98,21 +97,21 @@ main {
 	border-bottom: 0.5rem solid #0CA5B0;
 	padding-bottom: 1.5em;
 	margin-bottom: 2em;
-    box-shadow: 0 0 1em -0.5em #4E3F30;
+	box-shadow: 0 0 1em -0.5em #4E3F30;
 }
 
 .feed-item.finished {
 	opacity: 0.6;
-    height: 7em;
-    overflow: hidden;
-    margin-bottom: 0;
-    z-index: 0;
+	height: 7em;
+	overflow: hidden;
+	margin-bottom: 0;
+	z-index: 0;
 }
 
 .feed-item__audio-player {
-    padding: 0.5em;
-    display: inline-block;
-    float: left;
+	padding: 0.5em;
+	display: inline-block;
+	float: left;
 	margin-right: 1em;
 	background: #4E3F30;
 	border-bottom: 0.5rem solid #0CA5B0;
