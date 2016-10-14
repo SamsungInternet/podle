@@ -4,6 +4,10 @@ body {
     max-width: 100vw;
 }
 
+main {
+    transition: transform 1s ease;
+}
+
 /*
 * Dynamically load in WebFonts
 */
@@ -13,9 +17,13 @@ h1, h2 {
     line-height: 1em;
 }
 
-.wf-raleway-n4-active h1,
-.wf-raleway-n4-active h2 {
-    font-family: raleway, Helvetica, Arial, sans-serif;
+.wf-samsungone-n4-active h1, .wf-samsungone-n4-active button, .wf-samsungone-n4-active h2,
+.wf-samsungone-n7-active h1, .wf-samsungone-n7-active button, .wf-samsungone-n7-active h2 {
+    font-family: 'Samsung One', Helvetica, Arial, sans-serif;
+}
+
+p {
+    font-family: Cambria, Cochin, Georgia, Times, Times New Roman, serif;
 }
 
 header {
@@ -133,6 +141,7 @@ img {
     }
     main {
         max-width: 1024px;
+        width: 100%;
         margin: auto;
     }
     header {

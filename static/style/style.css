@@ -15,6 +15,12 @@ body {
     flex-direction: column;
 }
 
+body .filler {
+	background-color: #333;
+	color: transparent;
+	opacity: 0.4;
+}
+
 p {
 	line-height: 1.5em;
     max-width: 40em;
@@ -113,6 +119,11 @@ main {
 	color: white;
 }
 
+.feed-item__audio-player .filler {
+	background-color: white;
+}
+
+
 .feed-item__audio-player > span {
 	display: block;
 }
@@ -144,6 +155,10 @@ main {
 	color: #aaa;
 	font-style: italic;
 	margin: 0;
+}
+
+.feed-item__meta-byline .filler {
+	background-color: #aaa;
 }
 
 .feed-item__meta-button-area {

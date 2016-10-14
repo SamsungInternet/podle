@@ -84,6 +84,29 @@ d.run(function () {
 
 	app.get('/audioproxy/', audioProxy);
 
+	app.use('/static', express.static(__dirname + '/static', {
+		maxAge: 3600 * 1000 * 24
+	}));
+
+	app.use('/sw-no-push.js', express.static(__dirname + '/static/sw-no-push.js'));
+	app.use('/sw-with-push.js', express.static(__dirname + '/static/sw-with-push.js'));
+
+	app.get('/', function (req, res) {
+		res.redirect('/v7' + req.url || '/');
+	});
+
+	app.get('/feed', function (req, res) {
+		res.redirect('/v7' + req.url || '/');
+	});
+
+	app.get('/search', function (req, res) {
+		res.redirect('/v7' + req.url || '/');
+	});
+
+	app.use(bodyParser.json({
+		type: ['json', 'application/csp-report']
+	}));
+
 	app.get('/:version/search-legacy', function (req, res) {
 		const shouldDebug = !!req.query.debug;
 		getSearchLegacy(req.query.term)
@@ -167,9 +190,6 @@ d.run(function () {
 		});
 	});
 
-	app.use('/sw-no-push.js', express.static(__dirname + '/static/sw-no-push.js'));
-	app.use('/sw-with-push.js', express.static(__dirname + '/static/sw-with-push.js'));
-
 	app.get('/:version/', function (req, res, next) {
 		if (!req.params.version.match(/^v[0-9]+/)) {
 			return next();
@@ -178,22 +198,6 @@ d.run(function () {
 			layout: req.params.version
 		});
 	});
-
-	app.get('/', function (req, res) {
-		res.redirect('/v7' + req.url);
-	});
-
-	app.get('/feed', function (req, res) {
-		res.redirect('/v7' + req.url);
-	});
-
-	app.get('/search', function (req, res) {
-		res.redirect('/v7' + req.url);
-	});
-
-	app.use(bodyParser.json({
-		type: ['json', 'application/csp-report']
-	}));
 
 	function unfungleUrl(url) {
 
@@ -257,10 +261,5 @@ d.run(function () {
 		}
 		res.status(204).end();
 	});
-
-	app.use('/static', express.static(__dirname + '/static', {
-		maxAge: 3600 * 1000 * 24
-	}));
-
 	app.listen(process.env.PORT || 3000);
 });

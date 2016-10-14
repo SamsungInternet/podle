@@ -317,4 +317,9 @@ dbPodcasts.changes({
 		});
 });
 
-updateAllPodcastUI().then(updatePodcastItemsUI);
+function updatePage() {
+	updateAllPodcastUI().then(updatePodcastItemsUI);
+}
+updatePage();
+document.body.addEventListener('pageupdate', updatePage);
+
