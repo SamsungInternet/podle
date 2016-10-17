@@ -1,6 +1,6 @@
 'use strict';
 /* eslint no-console: 0, no-var: 0 */
-/* global PouchDB, Promise */
+/* global PouchDB, Promise, showMessage */
 
 var swPromise;
 var dbPodcasts = new PouchDB('podcastURLs');
@@ -43,18 +43,6 @@ function updateSubscription(subscription) {
 	// Make fetch request to update server
 }
 
-function showSubscribeButton() {
-	var p = document.createElement('div');
-	p.textContent = 'Subscribe to push notifcations';
-	p.classList.add('banner');
-	document.querySelector('header').before(p);
-	return new Promise(function (resolve) {
-		p.addEventListener('click', function () {
-			resolve(p);
-		});
-	});
-}
-
 // Load the service worker which does not have push notification support.
 if ('serviceWorker' in navigator) {
 	swPromise = navigator.serviceWorker.register('/sw-with-push.js', { scope: '/' })
@@ -90,10 +78,7 @@ if ('serviceWorker' in navigator) {
 					// reask for permission.
 					return swPromise
 						.then(function (reg) {
-							return showSubscribeButton()
-								.then(function (button) {
-									button.remove();
-								})
+							return showMessage('Subscribe to Push Notifcations?')
 								.then(function () {
 									return reg.pushManager.subscribe({ userVisibleOnly: true })
 								})

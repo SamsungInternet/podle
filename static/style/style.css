@@ -78,7 +78,7 @@ header h1 a:active {
 
 main {
 	background: white;
-	padding:  0.3rem 0.5rem;
+	padding:  0 0.5rem;
 	padding-bottom: 2em;
 	flex-grow: 1;
 }
@@ -234,11 +234,18 @@ label {
 	line-height: 1.75rem;
 }
 
+.banner-area {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+}
+
 .banner {
 	padding: 0.5em 0;
 	background: #FEFEEB;
 	text-align: center;
-	margin: 0 -1rem;
 	cursor: pointer;
 }
 

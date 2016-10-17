@@ -1,6 +1,6 @@
 // Some extra nice ui interactions to make it seem more app like
 /* eslint no-console: 0, no-var: 0 */
-/* global serialize */
+/* global serialize, Promise */
 'use strict';
 
 // Custom WebFonts
@@ -19,7 +19,15 @@ window.WebFontConfig = {
 } (document));
 
 function isOk(response) {
-	if (!response.ok) throw Error('Bad response code');
+	if (!response.ok) {
+		return Promise.resolve(response)
+			.then(getBody)
+			.then(parse)
+			.then(function (range) {
+				var message = range.querySelector('#message');
+				throw Error('Bad response: ' + (message.textContent || response.statusText) + ' (' + response.status + ')');
+			});
+	}
 	return response;
 }
 
@@ -62,64 +70,98 @@ function isLocal(url) {
 	return u.origin === window.location.origin;
 };
 
+function showMessage(message) {
+
+	var target = document.querySelector('.banner-area');
+	if (!target) {
+		var target = document.createElement('div');
+		target.classList.add('banner-area');
+		document.body.insertBefore(target, document.querySelector('header'));
+	}
+
+	var p = document.createElement('div');
+	p.textContent = message;
+	p.classList.add('banner');
+	target.appendChild(p);
+	return new Promise(function (resolve) {
+		p.addEventListener('click', function () {
+			resolve(p);
+		});
+	})
+	.then(function () {
+		target.removeChild(p);
+	});
+}
+
 var loading = false;
 function loadPage(url, replace, backwards) {
 	if (!replace && url === window.location.href || loading) return;
 	var backwards = backwards || (replace === true) || window.location.href.indexOf(url) === 0;
-	var titleEl = document.getElementsByTagName('title')[0];
-
 	var oldMainEl = document.querySelector('main:not([data-used])');
 	var newMainEl = document.createElement('main');
-	newMainEl.style.transform = 'translateX(' + (backwards ? '-' : '') + '100vw)';
-	oldMainEl.style.transform = 'translateX(' + (!backwards ? '-' : '') + '100vw)';
-	
+	var footer = document.querySelector('footer');
 	loading = true;
 	document.body.classList.add('loading');
 
-	newMainEl.style.position = 'absolute';
-	newMainEl.style.left = oldMainEl.offsetLeft + 'px';
-	newMainEl.style.top = oldMainEl.offsetTop + 'px';
-	newMainEl.style.width = oldMainEl.offsetWidth + 'px';
+	return new Promise(function (resolve) {
+		var titleEl = document.getElementsByTagName('title')[0];
+		newMainEl.innerHTML = url.match(/\/feed\?url=/) ? DUMMY_CONTENT : LOADING_SPINNER;
+		document.body.insertBefore(newMainEl, footer);
 
-	newMainEl.innerHTML = url.match(/\/feed\?url=/) ? DUMMY_CONTENT : LOADING_SPINNER;
-	oldMainEl.after(newMainEl);
-	
-	oldMainEl.dataset.used = '1';
-	
-	// Slide it back into position
-	setTimeout(function () {
+		newMainEl.style.transform = 'translateX(' + (backwards ? '-' : '') + '100vw)';
+		newMainEl.style.position = 'absolute';
+		newMainEl.style.left = oldMainEl.offsetLeft + 'px';
+		newMainEl.style.top = oldMainEl.offsetTop + 'px';
+		newMainEl.style.width = oldMainEl.offsetWidth + 'px';
+		newMainEl.style.height = oldMainEl.offsetHeight + 'px';
+
+		oldMainEl.getBoundingClientRect();
 		newMainEl.style.transform = '';
-	}, 60);
+		oldMainEl.style.transform = 'translateX(' + (!backwards ? '-' : '') + '100vw)';
+		oldMainEl.dataset.used = '1';
 
-	setTimeout(function () {
-		oldMainEl.remove();
-		newMainEl.style.position = '';
-		newMainEl.style.left = '';
-		newMainEl.style.top = '';
-		newMainEl.style.width = '';
-	}, 1060);
+		// flush again
+		oldMainEl.getBoundingClientRect();
+		var clearOldSlideTimeout = clearOldSlideTimeout = setTimeout(function () {
+			oldMainEl.remove();
+			newMainEl.style.position = '';
+			newMainEl.style.left = '';
+			newMainEl.style.top = '';
+			newMainEl.style.width = '';
+			newMainEl.style.height = '';
+		}, 1000);
 
-	return fetch(url)
-		// .then(isOk)
-		.then(getBody)
-		.then(parse)
-		.then(function (range) {
-			var title = range.querySelector('title').textContent;
-			titleEl.textContent = title;
-			var main = range.querySelector('main');
-			if (replace !== true) window.history.pushState({}, title, url);
-			return main;
-		})
-		.then(replaceEl(newMainEl))
-		.catch(function (e) {
-			console.log(e);
-			location.assign(url);
-		})
-		.then(function () {
-			loading = false;
-			document.body.classList.remove('loading');
-			document.body.dispatchEvent(new CustomEvent('pageupdate', {url: url}));
-		});
+		var fetchPromise = fetch(url)
+			.then(isOk)
+			.then(getBody)
+			.then(parse)
+			.then(function (range) {
+				var title = range.querySelector('title').textContent;
+				var main = range.querySelector('main');
+				titleEl.textContent = title;
+				if (replace !== true) window.history.pushState({}, title, url);
+				return main;
+			})
+			.then(replaceEl(newMainEl))
+			.catch(function (e) {
+				console.log(e);
+				showMessage('Failed to load, ' + e.message + ', please try again later.');
+				clearTimeout(clearOldSlideTimeout);
+				delete oldMainEl.dataset.used;
+				newMainEl.remove();
+				oldMainEl.style.transform = '';
+			})
+			.then(function () {
+				return url;
+			});
+
+		resolve(fetchPromise);
+	})
+	.then(function () {
+		loading = false;
+		document.body.classList.remove('loading');
+		document.body.dispatchEvent(new CustomEvent('pageupdate', { url: url }));
+	});
 }
 
 // Intercept local redirects and form submits to do it single page style and update the history
@@ -132,6 +174,7 @@ if (window.history.pushState && document.createRange) {
 		if ( url && isLocal(url) ) {
 			e.preventDefault();
 			loadPage(url);
+			if (!document.getElementById('hamburger').checked) document.getElementById('hamburger').click();
 		}
 	}
 
