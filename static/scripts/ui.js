@@ -100,36 +100,37 @@ function loadPage(url, replace, backwards) {
 	var oldMainEl = document.querySelector('main:not([data-used])');
 	var newMainEl = document.createElement('main');
 	var footer = document.querySelector('footer');
+	var titleEl = document.getElementsByTagName('title')[0];
+
 	loading = true;
 	document.body.classList.add('loading');
 
 	return new Promise(function (resolve) {
-		var titleEl = document.getElementsByTagName('title')[0];
-		newMainEl.innerHTML = url.match(/\/feed\?url=/) ? DUMMY_CONTENT : LOADING_SPINNER;
 		document.body.insertBefore(newMainEl, footer);
 
 		newMainEl.style.transform = 'translateX(' + (backwards ? '-' : '') + '100vw)';
+		oldMainEl.style.transform = 'translateX(' + (!backwards ? '-' : '') + '100vw)';
+
 		newMainEl.style.position = 'absolute';
 		newMainEl.style.left = oldMainEl.offsetLeft + 'px';
 		newMainEl.style.top = oldMainEl.offsetTop + 'px';
 		newMainEl.style.width = oldMainEl.offsetWidth + 'px';
-		newMainEl.style.height = oldMainEl.offsetHeight + 'px';
 
-		oldMainEl.getBoundingClientRect();
-		newMainEl.style.transform = '';
-		oldMainEl.style.transform = 'translateX(' + (!backwards ? '-' : '') + '100vw)';
 		oldMainEl.dataset.used = '1';
+		newMainEl.innerHTML = url.match(/\/feed\?url=/) ? DUMMY_CONTENT : LOADING_SPINNER;
 
-		// flush again
-		oldMainEl.getBoundingClientRect();
-		var clearOldSlideTimeout = clearOldSlideTimeout = setTimeout(function () {
+		// Slide it back into position
+		var clearNewSlideTimeout = setTimeout(function () {
+			newMainEl.style.transform = '';
+		}, 32);
+
+		var clearOldSlideTimeout = setTimeout(function () {
 			oldMainEl.remove();
 			newMainEl.style.position = '';
 			newMainEl.style.left = '';
 			newMainEl.style.top = '';
 			newMainEl.style.width = '';
-			newMainEl.style.height = '';
-		}, 1000);
+		}, 1032);
 
 		var fetchPromise = fetch(url)
 			.then(isOk)
@@ -147,6 +148,9 @@ function loadPage(url, replace, backwards) {
 				console.log(e);
 				showMessage(e.message + ', please try again later.');
 				clearTimeout(clearOldSlideTimeout);
+				clearTimeout(clearNewSlideTimeout);
+
+				// Restore everything
 				delete oldMainEl.dataset.used;
 				newMainEl.remove();
 				oldMainEl.style.transform = '';
