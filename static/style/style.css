@@ -221,7 +221,6 @@ main.starred .items .feed-item__meta-button-finished {
 
 #title_useful-buttons {
 	display: flex;
-	height: 28px;
 }
 
 #title_useful-buttons > * {
@@ -254,7 +253,6 @@ button, input[type="submit"] {
     border: 1px solid #0c787f;
     background: #0CA5B0;
     color: white;
-	height: 1.75rem;
 	font-size: 0.8rem;
 }
 

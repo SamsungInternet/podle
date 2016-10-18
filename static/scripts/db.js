@@ -135,11 +135,6 @@ function addFeedButton(el, isSaved) {
 
 	var classname = 'feed-item__meta-button-add-remove-to-my-podcasts';
 
-	var main = document.querySelector('main');
-	if (main) {
-		main.classList.toggle('starred', isSaved);
-	}
-
 	var button = el.querySelector('.' + classname);
 	if (button) {
 
@@ -186,18 +181,25 @@ function goToFirstUnread() {
 	}
 }
 
-function updateAllPodcastUI() {
+function updateAllPodcastUI(main) {
+	main = main || document.querySelector('main:not([data-used])');
 	return dbPodcasts.allDocs({
 		include_docs: true
 	}).then(function(result) {
 		var listHTML = '';
-		var addFeedTargets = new Set(Array.from(document.querySelectorAll('.feed-detail')));
+		var addFeedTargets = new Set(Array.from(main.querySelectorAll('.feed-detail')));
 		var finishedWith = [];
+		var hasTitle;
 
 		if (result.total_rows) {
 			result.rows.forEach(function (row) {
 				listHTML += '<li class="feed-detail" data-url="' + safeString(row.id) +'" data-name="' + safeString(row.doc.title) +'"><a href="feed?url=' + safeString(row.id) + '">' + safeString(row.doc.title) + '</a></li>';
-				var matches = Array.from(document.querySelectorAll('.feed-detail[data-url="' + safeString(row.id) + '"]'));
+				var matches = Array.from(main.querySelectorAll('.feed-detail[data-url="' + safeString(row.id) + '"]'));
+
+				if (main && !hasTitle) {
+					hasTitle = !main.querySelector('.feed-title.feed-detail[data-url="' + safeString(row.id) + '"]');
+					if (hasTitle) main.classList.add('starred');
+				}
 
 				matches.forEach(function(el) {
 					addFeedButton(el, true);
@@ -213,7 +215,7 @@ function updateAllPodcastUI() {
 			addFeedButton(el, false);
 		});
 
-		Array.from(document.querySelectorAll('.my-podcasts')).forEach(function(ul) {
+		Array.from(main.querySelectorAll('.my-podcasts')).forEach(function(ul) {
 			ul.innerHTML = listHTML;
 			Array.from(ul.childNodes).forEach(function (el) {
 				addFeedButton(el, true);
@@ -221,7 +223,7 @@ function updateAllPodcastUI() {
 		});
 
 		(function () {
-			var titleButtonArea = document.getElementById('title_useful-buttons');
+			var titleButtonArea = main.querySelector('#title_useful-buttons');
 			var classnameAllRead = 'feed-item__meta-button-mark-all-as-read';
 			var classnameFirstUnread = 'feed-item__meta-button-goto-first-unread';
 			if (titleButtonArea) {
@@ -317,8 +319,8 @@ dbPodcasts.changes({
 		});
 });
 
-function updatePage() {
-	updateAllPodcastUI().then(updatePodcastItemsUI);
+function updatePage(e) {
+	updateAllPodcastUI(e && e.detail.main).then(updatePodcastItemsUI);
 }
 updatePage();
 document.body.addEventListener('pageupdate', updatePage);

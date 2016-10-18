@@ -164,7 +164,12 @@ function loadPage(url, replace, backwards) {
 	.then(function () {
 		loading = false;
 		document.body.classList.remove('loading');
-		document.body.dispatchEvent(new CustomEvent('pageupdate', { url: url }));
+		var evt = document.createEvent("CustomEvent");
+		evt.initCustomEvent('pageupdate', false, false, {
+			url: url,
+			main: newMainEl
+		});
+		document.body.dispatchEvent(evt);
 	});
 }
 
