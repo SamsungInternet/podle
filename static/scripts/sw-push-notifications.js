@@ -3,7 +3,6 @@
 /* eslint-env es6 */
 'use strict';
 
-
 self.cacheAndNotifyDoNotSave = function (request) {
 
 	let u = new URL(request.url).search.match(/^\?url=(.+)/);
