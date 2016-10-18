@@ -25,7 +25,7 @@ function isOk(response) {
 			.then(parse)
 			.then(function (range) {
 				var message = range.querySelector('#message');
-				throw Error('Bad response: ' + (message.textContent || response.statusText) + ' (' + response.status + ')');
+				throw Error(message.textContent || ('Bad response: ' + response.statusText + ' (' + response.status + ')'));
 			});
 	}
 	return response;
@@ -145,7 +145,7 @@ function loadPage(url, replace, backwards) {
 			.then(replaceEl(newMainEl))
 			.catch(function (e) {
 				console.log(e);
-				showMessage('Failed to load, ' + e.message + ', please try again later.');
+				showMessage(e.message + ', please try again later.');
 				clearTimeout(clearOldSlideTimeout);
 				delete oldMainEl.dataset.used;
 				newMainEl.remove();
