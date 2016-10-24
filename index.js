@@ -156,6 +156,10 @@ d.run(function () {
 			const shoudJson = !!req.query.json;
 			const cacheBust = !!req.query.cb;
 			return getRSSItem(unfungleUrl(url), shouldDebug || shoudJson || cacheBust)
+				.catch(e => {
+					console.log(e.message, url);
+					return getRSSItem(unfungleUrl(url, true), shouldDebug || shoudJson || cacheBust)
+				})
 				.then(function (feedData) {
 
 					feedData.url = url;
@@ -199,7 +203,7 @@ d.run(function () {
 		});
 	});
 
-	function unfungleUrl(url) {
+	function unfungleUrl(url, addFormat) {
 
 		if (url.match(/^https?%3A%2F%2F/i)) {
 			url = decodeURIComponent(url);
@@ -208,8 +212,10 @@ d.run(function () {
 		url = URL.parse(url);
 		delete url.search;
 		url.query = querystring.parse(url.query);
-		url.query.format = 'xml';
-		url.query.fmt = 'xml';
+		if (addFormat) {
+			url.query.format = 'xml';
+			url.query.fmt = 'xml';
+		}
 		url = URL.format(url);
 
 		return url;
