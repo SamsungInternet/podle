@@ -272,7 +272,13 @@ function updatePodcastItemsUI(readItems) {
 			var hash = feedUrl.pop();
 			feedUrl = feedUrl.join('__');
 
-			listHTML += '<li class="feed-item-detail" data-feed-item-id="' + safeString(row.id) +'" data-title="' + safeString(row.doc.title) +'" data-feed="' + feedUrl + '"><a href="feed?url=' + feedUrl + '#' + hash + '">' + safeString(row.doc.title) + '</a><div><audio src="/audioproxy?url=' + encodeURIComponent(row.doc.mediaUrl) + '" controls preload="none"></audio></div></li>';
+			var html = '<li class="feed-item-detail" data-feed-item-id="' + safeString(row.id) + '" data-title="' + safeString(row.doc.title) + '" data-feed="' + feedUrl + '"><a href="feed?url=' + feedUrl + '#' + hash + '">' + safeString(row.doc.title) + '</a>';
+
+			if (row.doc.mediaUrl) {
+				html += '<div><audio src= "/audioproxy?url=' + encodeURIComponent(row.doc.mediaUrl) + '" controls preload= "none"></audio><br /> <a href="' + row.doc.mediaUrl +'" download target="_blank" rel="noopener" rel="nofollow" title="Direct Download: ' + safeString(row.doc.title) + '">Original podcast file</a></div>';
+			}
+
+			listHTML += html + '</li >';
 			return row.id;
 		});
 
