@@ -219,6 +219,10 @@ main.starred .items .feed-item__meta-button-finished {
 	float: right;
 }
 
+.saved-for-later li {
+	margin-top: 0.7em;
+}
+
 #title_useful-buttons {
 	display: flex;
 }

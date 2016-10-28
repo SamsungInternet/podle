@@ -17,7 +17,7 @@
 		<div class="feed-item__meta feed-item-detail" data-feed="{{#encodeURIComponent}}{{{ ../url }}}{{/encodeURIComponent}}" data-title="{{title}}" data-feed-item-id="{{#encodeURIComponent}}{{{ ../url }}}{{/encodeURIComponent}}__{{#mangle}}{{title}}{{/mangle}}"{{#media:content}} data-media-url="{{url}}"{{/media:content}}>
 			<h2 class="feed-item__meta-title"><a href="#{{#mangle}}{{title}}{{/mangle}}" id="{{#mangle}}{{title}}{{/mangle}}">{{title}}</a></h2>
 			<time>Updated - {{humanDate}}</time>
-			<p class="feed-item__meta-byline"><a href="{{link}}">by {{#if author}}<span class="author">{{author}}</span>{{/if}}</a></p>
+			{{#if author}}<p class="feed-item__meta-byline"><a href="{{#if link}}{{link}}{{else}}#{{/if}}">by <span class="author">{{author}}</span></a></p>{{/if}}
 		</div>
 		{{#media:content}}
 			<div class="feed-item__audio-player">
@@ -29,6 +29,7 @@
 			</div>
 		{{/media:content}}
 		<p>{{{description}}}</p>
+		{{#if link}}<p><a href="{{link}}"></a></p>{{/if}}
 	</div>
 {{/items}}
 </div>

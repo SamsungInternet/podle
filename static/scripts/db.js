@@ -73,8 +73,8 @@ function onAddToList(e) {
 		_id: e.target.dataset.feedItemId,
 		type: 'feed-item',
 		title: e.target.dataset.title,
-		mediaUrl: e.target.dataset.mediaUrl
 	};
+	if (e.target.dataset.mediaUrl) doc.mediaUrl = e.target.dataset.mediaUrl;
 	if (e.target.dataset.action === 'list') dbPodcastItems
 		.put(doc)
 		.catch(handleErr);
@@ -119,7 +119,7 @@ function addFeedItemButtons(item, read, listed) {
 	tempButton.addEventListener('click', onAddToList);
 	tempButton.dataset.action = listed ? 'unlist' : 'list';
 	tempButton.dataset.feedItemId = feedItemId;
-	tempButton.dataset.mediaUrl = mediaUrl;
+	if (mediaUrl) tempButton.dataset.mediaUrl = mediaUrl;
 	tempButton.dataset.title = title;
 	tempButton.textContent = listed ? 'Remove from List' : 'Add to List';
 	tempButton.title = tempButton.textContent;
@@ -274,7 +274,7 @@ function updatePodcastItemsUI(readItems) {
 
 			var html = '<li class="feed-item-detail" data-feed-item-id="' + safeString(row.id) + '" data-title="' + safeString(row.doc.title) + '" data-feed="' + feedUrl + '"><a href="feed?url=' + feedUrl + '#' + hash + '">' + safeString(row.doc.title) + '</a>';
 
-			if (row.doc.mediaUrl) {
+			if (row.doc.mediaUrl && row.doc.mediaUrl.match(/^https?:\/\//)) {
 				html += '<div><audio src= "/audioproxy?url=' + encodeURIComponent(row.doc.mediaUrl) + '" controls preload= "none"></audio><br /> <a href="' + row.doc.mediaUrl +'" download target="_blank" rel="noopener" rel="nofollow" title="Direct Download: ' + safeString(row.doc.title) + '">Original podcast file</a></div>';
 			}
 
