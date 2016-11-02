@@ -93,16 +93,27 @@ function showMessage(message) {
 	});
 }
 
-var loading = false;
 function loadPage(url, replace, backwards) {
-	if (!replace && url === window.location.href || loading) return;
+
+	// if going back to a page which did not finished loading try loading it
+	if (window.history.state && backwards && window.history.state.loading) {
+		url = window.history.state.url;
+	}
+
 	var backwards = backwards || (replace === true) || window.location.href.indexOf(url) === 0;
+	if (!backwards && !replace && url === window.location.href) return;
 	var oldMainEl = document.querySelector('main:not([data-used])');
 	var newMainEl = document.createElement('main');
 	var footer = document.querySelector('footer');
 	var titleEl = document.getElementsByTagName('title')[0];
 
-	loading = true;
+	if (window.history.state && !window.history.state.loading && !backwards) {
+		window.history.pushState({
+			loading: true,
+			url: url
+		}, titleEl.textContent, window.location.href);
+	}
+
 	document.body.classList.add('loading');
 
 	return new Promise(function (resolve) {
@@ -140,7 +151,7 @@ function loadPage(url, replace, backwards) {
 				var title = range.querySelector('title').textContent;
 				var main = range.querySelector('main');
 				titleEl.textContent = title;
-				if (replace !== true) window.history.pushState({}, title, url);
+				if (replace !== true) window.history.replaceState({}, title, url);
 				return main;
 			})
 			.then(replaceEl(newMainEl))
@@ -150,10 +161,9 @@ function loadPage(url, replace, backwards) {
 				clearTimeout(clearOldSlideTimeout);
 				clearTimeout(clearNewSlideTimeout);
 
-				// Restore everything
-				delete oldMainEl.dataset.used;
-				newMainEl.remove();
-				oldMainEl.style.transform = '';
+				if (window.history.state && window.history.state.loading) {
+					window.history.back();
+				}
 			})
 			.then(function () {
 				return url;
@@ -162,8 +172,6 @@ function loadPage(url, replace, backwards) {
 		resolve(fetchPromise);
 	})
 	.then(function () {
-		loading = false;
-		document.body.classList.remove('loading');
 		var evt = document.createEvent("CustomEvent");
 		evt.initCustomEvent('pageupdate', false, false, {
 			url: url,
@@ -194,6 +202,6 @@ if (window.history.pushState && document.createRange) {
 	});
 }
 
-var LOADING_SPINNER = '<div class="spinner">Loading...</div>';
+var LOADING_SPINNER = '<div class="spinner"><h2>Loading...</h2></div>';
 
 var DUMMY_CONTENT = '<h1 class="feed-title feed-detail"><span class="filler">██████</span> <span class="filler">████</span> <span class="filler">██</span> <span class="filler">████████</span></h1> <div><span class="filler">█</span> <button class="feed-item__meta-button-mark-all-as-read" title="Mark All"><span class="filler">████</span> <span class="filler">███</span></button> <button class="feed-item__meta-button-goto-first-unread" title="Goto First Item"><span class="filler">████</span> <span class="filler">█████</span> <span class="filler">████</span></button> <button class="feed-item__meta-button-goto-first-unread" title="Check for updates"><span class="filler">█████</span> <span class="filler">███</span> <span class="filler">███████</span></button> </div> <p class="description"><span class="filler">█████████████</span> <span class="filler">█████████</span> <span class="filler">███████</span> <span class="filler">███</span> <span class="filler">███</span> <span class="filler">█████</span> <span class="filler">██████</span> <span class="filler">████</span> <span class="filler">██</span> <span class="filler">█████</span> <span class="filler">█████</span> <span class="filler">█████████</span> <span class="filler">█████</span> <span class="filler">████████</span> <span class="filler">█████</span> <span class="filler">█████████████</span> <span class="filler">████</span> <span class="filler">███</span> <span class="filler">█████████</span> <span class="filler">██████</span> <span class="filler">███████</span> <span class="filler">██████████</span> <span class="filler">██████</span> <span class="filler">██</span> <span class="filler">███</span> <span class="filler">█████</span> <span class="filler">████</span> <span class="filler">████</span> <span class="filler">██████</span> <span class="filler">███████</span> <span class="filler">████</span> <span class="filler">██████████</span> <span class="filler">███████</span> <span class="filler">███</span> <span class="filler">████████</span> <span class="filler">███████</span> <span class="filler">████</span> <span class="filler">██</span> <span class="filler">████</span> <span class="filler">█████</span> <span class="filler">███</span> <span class="filler">█████</span> <span class="filler">█████</span> <span class="filler">████████</span> <span class="filler">███████</span> <span class="filler">████</span> <span class="filler">██</span> <span class="filler">███████</span> <span class="filler">█████</span> <span class="filler">█████</span> <span class="filler">█████</span> <span class="filler">████</span> <span class="filler">███</span> <span class="filler">███████</span> <span class="filler">████████</span> <span class="filler">███</span> <span class="filler">██████</span> <span class="filler">█████</span> <span class="filler">██</span> <span class="filler">██</span> <span class="filler">██</span> <span class="filler">█████</span> <span class="filler">███</span> <span class="filler">██</span> <span class="filler">█████</span> <span class="filler">██</span> <span class="filler">███████</span> <span class="filler">█</span> <span class="filler">██</span> <span class="filler">███</span> <span class="filler">█████</span> <span class="filler">█████████████</span> <span class="filler">█████████</span> <span class="filler">██</span> <span class="filler">█████</span> <span class="filler">████</span> <span class="filler">█████████</span> <span class="filler">███████</span> <span class="filler">██</span> <span class="filler">██████</span> <span class="filler">████</span> <span class="filler">███</span> <span class="filler">███████</span> <span class="filler">███████</span> <span class="filler">████████</span> <span class="filler">██</span> <span class="filler">█████</span> <span class="filler">████████</span> <span class="filler">██</span> <span class="filler">███████</span> <span class="filler">██</span> <span class="filler">███████████████</span></p> <p class="copyright"><span class="filler">█</span> <span class="filler">█████</span> <span class="filler">███████████</span> <span class="filler">█████</span></p> <div class="items"> <div class="feed-item"> <div class="feed-item__meta feed-item-detail"> <div class="feed-item__meta-button-area"><button title="Mark as Finished" class="feed-item__meta-button-finished"><span class="filler">████</span> <span class="filler">██</span> <span class="filler">████████</span></button> <button title="Add to List" class="feed-item__meta-button-add-to-list"><span class="filler">███</span> <span class="filler">██</span> <span class="filler">████</span></button></div> <h2 class="feed-item__meta-title"><span class="filler">████</span> <span class="filler">████████</span> <span class="filler">█████</span> <span class="filler">██████</span> <span class="filler">███</span> <span class="filler">███</span> <span class="filler">█████</span> <span class="filler">██████</span> <span class="filler">████</span> <span class="filler">███████</span> <span class="filler">█</span></h2> <time><span class="filler">███████</span> <span class="filler">█</span> <span class="filler">██████████</span> <span class="filler">███████</span> <span class="filler">███</span> <span class="filler">████</span> <span class="filler">████</span> <span class="filler">██</span></time> <p class="feed-item__meta-byline"><span class="filler">██</span> <span class="author"><span class="filler">███████████</span> <span class="filler">█████</span></span></p> </div> <div class="feed-item__audio-player"> <audio controls="" preload="none"> <span><a target="_blank" rel="noopener"><span class="filler">███</span> <span class="filler">████████</span> <span class="filler">█████</span> <span class="filler">██████</span> <span class="filler">███</span> <span class="filler">███</span> <span class="filler">█████</span> <span class="filler">██████</span> <span class="filler">████</span> <span class="filler">███████</span> <span class="filler">█</span> <span class="filler">█</span><span class="filesize"><span class="filler">████████</span></span> <span class="filler">███████████</span></span> </audio> <span><span class="filler">██</span> <span class="filler">████</span> <span class="filler">███</span> <span class="filler">██████</span> <span class="filler">████</span> <span class="filler">███</span> <span class="filler">████</span> <br><span class="filler">███</span> <span class="filler">███</span> <a download="" target="_blank" rel="noopener" title="Direct Download: The Orbiting Human Circus (of the Air): Season One, Episode 1"><span class="filler">████████</span> <span class="filler">███████</span> <span class="filler">█████</span><br><span class="filler">█</span><span class="filesize"><span class="filler">███████</span></span> <span class="filler">███████████</span></span> </div> <p></p> <p><span class="filler">███████</span> <span class="filler">██</span> <span class="filler">███</span> <span class="filler">█████</span> <span class="filler">██</span> <em><span class="filler">███</span> <span class="filler">████████</span> <span class="filler">█████</span> <span class="filler">██████</span></em><span class="filler">█</span> <span class="filler">████████</span> <span class="filler">███</span> <span class="filler">█████████</span> <span class="filler">██████████</span> <span class="filler">█████</span> <span class="filler">████</span> <span class="filler">█████████</span> <span class="filler">████</span> <span class="filler">███</span> <span class="filler">███</span> <span class="filler">██</span> <span class="filler">███</span> <span class="filler">██████</span> <span class="filler">██████</span> <span class="filler">████</span> <span class="filler">███</span> <span class="filler">██████</span> <span class="filler">███████</span> <span class="filler">███</span> <span class="filler">█████</span> <span class="filler">██</span> <span class="filler">██████</span> <span class="filler">████</span> <span class="filler">██</span> <span class="filler">███</span> <span class="filler">███</span> <span class="filler">██████</span> <span class="filler">██</span> <span class="filler">███</span> <span class="filler">███</span> <span class="filler">████████</span> <span class="filler">████</span> <span class="filler">██</span> <span class="filler">███████</span> <span class="filler">███</span> <span class="filler">████</span></p> <p><span class="filler">████████</span> <span class="filler">████████</span> <span class="filler">█████████</span> <span class="filler">██</span> <em><span class="filler">███</span> <span class="filler">████████</span> <span class="filler">█████</span> <span class="filler">██████</span> <span class="filler">███</span> <span class="filler">███</span> <span class="filler">████</span></em><span class="filler">█</span> <span class="filler">█████████</span> <span class="filler">███</span> <span class="filler">███</span> <span class="filler">███████</span> <span class="filler">███████</span> <span class="filler">█████████</span> <span class="filler">██</span> <span class="filler">███</span> <span class="filler">███</span> <span class="filler">██</span> <span class="filler">████</span> <span class="filler">████████</span> <span class="filler">████████████</span></p> <p><span class="filler">██████</span> <span class="filler">██</span> <span class="filler">██████</span> <span class="filler">████████</span> <span class="filler">██</span> <span class="filler">███████</span> <span class="filler">█████</span> <span class="filler">███</span> <span class="filler">████</span> <span class="filler">███████</span> <span class="filler">███</span> <span class="filler">██████████</span> <span class="filler">███</span> <span class="filler">█████</span> <span class="filler">████████</span> <span class="filler">███</span> <span class="filler">████</span> <span class="filler">████</span> <span class="filler">███████</span> <span class="filler">███</span> <span class="filler">████</span> <span class="filler">██████</span> <span class="filler">████</span> <span class="filler">██</span> <span class="filler">███</span> <span class="filler">█████</span> <span class="filler">███</span> <span class="filler">█████</span> <span class="filler">███</span> <span class="filler">███</span> <span class="filler">████</span> <span class="filler">███</span> <span class="filler">███</span> <span class="filler">██</span> <span class="filler">███</span> <span class="filler">███████</span> <span class="filler">███</span> <span class="filler">███</span> <span class="filler">██</span> <span class="filler">███</span> <span class="filler">█████</span> <span class="filler">█████</span> <span class="filler">███</span> <span class="filler">██████</span> <span class="filler">████████</span> <span class="filler">██</span> <span class="filler">█████████████████████</span></p> <p><span class="filler">█████████</span> <span class="filler">████</span> <span class="filler">███████</span> <span class="filler">████████</span> <span class="filler">██</span> <span class="filler">███</span> <span class="filler">████████</span> <span class="filler">██████</span> <span class="filler">██████</span> <span class="filler">██</span> <span class="filler">███</span> <span class="filler">████████</span> <span class="filler">███</span> <span class="filler">████</span> <span class="filler">█████████</span> <span class="filler">██</span> <span class="filler">███</span> <span class="filler">█████████</span> <span class="filler">███</span> <span class="filler">████</span> <span class="filler">████████</span> <span class="filler">██</span> <span class="filler">██</span> <span class="filler">████████████████████████████</span></p></div> </div> </main>';
