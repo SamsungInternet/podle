@@ -95,11 +95,6 @@ function showMessage(message) {
 
 function loadPage(url, pop) {
 
-	// if going back to a page which did not finished loading try loading it
-	if (window.history.state && pop && window.history.state.loading) {
-		url = window.history.state.url;
-	}
-
 	var backwards = pop || window.location.href.indexOf(url) === 0;
 	if (!backwards && !pop && url === window.location.href) return;
 	var oldMainEl = document.querySelector('main:not([data-used])');
@@ -107,11 +102,8 @@ function loadPage(url, pop) {
 	var footer = document.querySelector('footer');
 	var titleEl = document.getElementsByTagName('title')[0];
 
-	if (!pop && (window.history.state && !window.history.state.loading) && !pop) {
-		window.history.pushState({
-			loading: true,
-			url: url
-		}, titleEl.textContent, window.location.href);
+	if (!pop) {
+		window.history.pushState({}, titleEl.textContent, url);
 	}
 
 	document.body.classList.add('loading');
@@ -151,7 +143,7 @@ function loadPage(url, pop) {
 				var title = range.querySelector('title').textContent;
 				var main = range.querySelector('main');
 				titleEl.textContent = title;
-				if (pop !== true) window.history.replaceState({}, title, url);
+				window.history.replaceState({}, title, url);
 				return main;
 			})
 			.then(replaceEl(newMainEl))
