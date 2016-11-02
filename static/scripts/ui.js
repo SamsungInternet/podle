@@ -93,21 +93,21 @@ function showMessage(message) {
 	});
 }
 
-function loadPage(url, replace, backwards) {
+function loadPage(url, pop) {
 
 	// if going back to a page which did not finished loading try loading it
-	if (window.history.state && backwards && window.history.state.loading) {
+	if (window.history.state && pop && window.history.state.loading) {
 		url = window.history.state.url;
 	}
 
-	var backwards = backwards || (replace === true) || window.location.href.indexOf(url) === 0;
-	if (!backwards && !replace && url === window.location.href) return;
+	var backwards = pop || window.location.href.indexOf(url) === 0;
+	if (!backwards && !pop && url === window.location.href) return;
 	var oldMainEl = document.querySelector('main:not([data-used])');
 	var newMainEl = document.createElement('main');
 	var footer = document.querySelector('footer');
 	var titleEl = document.getElementsByTagName('title')[0];
 
-	if (window.history.state && !window.history.state.loading && !backwards) {
+	if (!pop && (window.history.state && !window.history.state.loading) && !pop) {
 		window.history.pushState({
 			loading: true,
 			url: url
@@ -151,7 +151,7 @@ function loadPage(url, replace, backwards) {
 				var title = range.querySelector('title').textContent;
 				var main = range.querySelector('main');
 				titleEl.textContent = title;
-				if (replace !== true) window.history.replaceState({}, title, url);
+				if (pop !== true) window.history.replaceState({}, title, url);
 				return main;
 			})
 			.then(replaceEl(newMainEl))
