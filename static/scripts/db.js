@@ -182,7 +182,7 @@ function goToFirstUnread() {
 }
 
 function updateAllPodcastUI(main) {
-	main = main || document.querySelector('main:not([data-used])');
+	main = main || document.querySelector('.main-content:not([data-used])');
 	return dbPodcasts.allDocs({
 		include_docs: true
 	}).then(function(result) {

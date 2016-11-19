@@ -6,12 +6,11 @@ body {
 	font-family: 'Helvetica', 'Sans';
 	font-size: 16px;
 	color: #333;
-	padding: 0 1rem;
+	padding-left: 1rem;
 	background: white;
 	margin: 0;
-	overflow-x: hidden;
 	min-height: 100vh;
-	display: flex;
+	max-height: 100vh;
 	flex-direction: column;
 }
 
@@ -78,9 +77,11 @@ header h1 a:active {
 
 main {
 	background: white;
-	padding:  0 0.5rem;
-	padding-bottom: 2em;
 	flex-grow: 1;
+	flex-shrink: 1;
+	min-height: 0;
+	position: relative;
+	display: flex;
 }
 
 .feed-title {
@@ -183,8 +184,8 @@ main .items .feed-item__meta-button-finished {
 	display: none;
 }
 
-main.starred .feed-item__meta-button-mark-all-as-read,
-main.starred .items .feed-item__meta-button-finished {
+.main-content.starred .feed-item__meta-button-mark-all-as-read,
+.main-content.starred .items .feed-item__meta-button-finished {
 	display: inline-block;
 }
 

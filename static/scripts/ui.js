@@ -46,21 +46,36 @@ function getBody(response) {
 	return response.text();
 }
 
-var parse =function getEl(body) {
+var parse = function getEl(body) {
 	return document.createRange().createContextualFragment(body);
 };
 
 var replaceEl = curry2(function replaceEl(oldEl, newEl) {
 	oldEl.innerHTML = '';
-	while (newEl.firstChild) {
-		if (newEl.firstChild.tagName === 'script') {
-			newEl.removeChild(newEl.firstChild);
-			return;
-		}
-		oldEl.appendChild(newEl.firstChild);
-	}
-	newEl.remove();
-	return newEl;
+	return new Promise(function (resolve) {
+		(function addItem() {
+			if (newEl.firstChild) {
+				if (newEl.firstChild.tagName === 'script') {
+					newEl.removeChild(newEl.firstChild);
+				} else {
+					oldEl.appendChild(newEl.firstChild);
+				}
+
+				// Don't add large amounts at once'
+				if (Math.random() < 0.3) {
+					if (window.requestIdleCallback) {
+						requestIdleCallback(addItem);
+					} else {
+						setTimeout(addItem, 16);
+					}
+				} else {
+					addItem();
+				}
+			} else {
+				resolve();
+			}
+		} ());
+	});
 });
 
 function isLocal(url) {
@@ -96,11 +111,14 @@ function showMessage(message) {
 function loadPage(url, pop) {
 
 	var backwards = pop || window.location.href.indexOf(url) === 0;
-	if (!backwards && !pop && url === window.location.href) return;
-	var oldMainEl = document.querySelector('main:not([data-used])');
-	var newMainEl = document.createElement('main');
+	if (!pop && url === window.location.href) return;
+	var oldMainEl = document.querySelector('main > div.main-content:not([data-used])');
+	var main = document.querySelector('main');
 	var footer = document.querySelector('footer');
 	var titleEl = document.getElementsByTagName('title')[0];
+
+	var newMainEl = document.createElement('div');
+	newMainEl.classList.add('main-content');
 
 	if (!pop) {
 		window.history.pushState({}, titleEl.textContent, url);
@@ -109,31 +127,35 @@ function loadPage(url, pop) {
 	document.body.classList.add('loading');
 
 	return new Promise(function (resolve) {
-		document.body.insertBefore(newMainEl, footer);
 
-		newMainEl.style.transform = 'translateX(' + (backwards ? '-' : '') + '100vw)';
-		oldMainEl.style.transform = 'translateX(' + (!backwards ? '-' : '') + '100vw)';
-
-		newMainEl.style.position = 'absolute';
-		newMainEl.style.left = oldMainEl.offsetLeft + 'px';
-		newMainEl.style.top = oldMainEl.offsetTop + 'px';
-		newMainEl.style.width = oldMainEl.offsetWidth + 'px';
+		var clearOldSlideTimeout;
 
 		oldMainEl.dataset.used = '1';
 		newMainEl.innerHTML = url.match(/\/feed\?url=/) ? DUMMY_CONTENT : LOADING_SPINNER;
+		main.style.transition = '';
 
-		// Slide it back into position
-		var clearNewSlideTimeout = setTimeout(function () {
-			newMainEl.style.transform = '';
-		}, 32);
+		// Only transition on mobile
+		if (document.body.clientWidth < 600) {
+			if (backwards) {
+				main.insertBefore(newMainEl, main.firstChild);
+				newMainEl.style.transform = 'translateX(-100%) translateX(-1rem)';
+				oldMainEl.style.transform = 'translateX(-100%) translateX(-1rem)';
+				main.style.transform = 'translateX(50%) translateX(1rem)';
+			} else {
+				main.appendChild(newMainEl);
+				main.style.transform = 'translateX(-50%) translateX(-1rem)';
+			}
 
-		var clearOldSlideTimeout = setTimeout(function () {
+			clearOldSlideTimeout = setTimeout(function () {
+				oldMainEl.remove();
+				newMainEl.style.transform = '';
+				main.style.transition = 'none';
+				main.style.transform = '';
+			}, 1032);
+		} else {
 			oldMainEl.remove();
-			newMainEl.style.position = '';
-			newMainEl.style.left = '';
-			newMainEl.style.top = '';
-			newMainEl.style.width = '';
-		}, 1032);
+			main.appendChild(newMainEl);
+		}
 
 		var fetchPromise = fetch(url)
 			.then(isOk)
@@ -141,17 +163,16 @@ function loadPage(url, pop) {
 			.then(parse)
 			.then(function (range) {
 				var title = range.querySelector('title').textContent;
-				var main = range.querySelector('main');
+				var mainContent = range.querySelector('main > div.main-content');
 				titleEl.textContent = title;
 				window.history.replaceState({}, title, url);
-				return main;
+				return mainContent;
 			})
 			.then(replaceEl(newMainEl))
 			.catch(function (e) {
 				console.log(e);
 				showMessage(e.message + ', please try again later.');
 				clearTimeout(clearOldSlideTimeout);
-				clearTimeout(clearNewSlideTimeout);
 
 				if (window.history.state && window.history.state.loading) {
 					window.history.back();

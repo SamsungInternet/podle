@@ -2,10 +2,26 @@ html,
 body {
     box-sizing: content-box;
     max-width: 100vw;
+    display: flex;
+    overflow: hidden;
+    width: 100%;
 }
 
+/* Let main be double width but it's contents half width*/
 main {
+    min-width: 200%;
     transition: transform 1s ease;
+}
+
+main > div.main-content {
+    width: 50%;
+    overflow-y: auto;
+    padding-right: 1rem;
+}
+
+main > div.main-content[data-used="1"] {
+    opacity: 0;
+    transition: opacity 0.8s ease;
 }
 
 /*
@@ -139,11 +155,6 @@ img {
     }
     .index-content div {
         flex-grow: 1;
-    }
-    main {
-        max-width: 1024px;
-        width: 100%;
-        margin: auto;
     }
     header {
         padding-right: 10em;
