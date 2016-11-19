@@ -1,6 +1,5 @@
 /* global caches, Request, self, clients */
 /* jshint browser:true */
-/* eslint-env es6 */
 'use strict';
 
 self.cacheAndNotifyDoNotSave = function (request) {
@@ -24,16 +23,18 @@ self.cacheAndNotifyDoNotSave = function (request) {
 	return self.registration.showNotification('Caching ' + u, {
 		icon: 'https://podle.ada.is/static/icon192.png'
 	})
-	.then(event => {
-		return cache(u).then(() => event.notification.close());
+	.then(function (event) {
+		return cache(u).then(function () { event.notification.close() });
 	})
-	.then(() => {
+	.then(function () {
 		return self.registration.showNotification('Cached ' + u, {
 			icon: 'https://podle.ada.is/static/icon192.png'
 		});
 	})
-	.then(() => new Response('Cached Successfully'))
-	.catch(e => {
+	.then(function () {
+		new Response('Cached Successfully');
+	})
+	.catch(function (e) {
 		return self.registration.showNotification('Failed to Cache ' + u + ': ' + e.message, {
 			icon: 'https://podle.ada.is/static/icon192.png'
 		});
