@@ -163,7 +163,7 @@ function loadPage(url, pop) {
 			.then(parse)
 			.then(function (range) {
 				var title = range.querySelector('title').textContent;
-				var mainContent = range.querySelector('main > div.main-content');
+				var mainContent = range.querySelector('main > div.main-content') || range.querySelector('main');
 				titleEl.textContent = title;
 				window.history.replaceState({}, title, url);
 				return mainContent;
