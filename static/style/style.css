@@ -48,6 +48,13 @@ blockquote {
 	overflow: hidden;
 }
 
+footer {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+}
+
 header {
 	align-items: baseline;
 	padding-right: 2em;
@@ -118,6 +125,7 @@ main {
 	background: #4E3F30;
 	border-bottom: 0.5rem solid #0CA5B0;
 	color: white;
+	transform: scale(0.95) translateZ(25px);
 }
 
 .feed-item__audio-player .filler {
@@ -226,6 +234,8 @@ main .items .feed-item__meta-button-finished {
 
 #title_useful-buttons {
 	display: flex;
+	flex-shrink: 0;
+	flex-grow: 0;
 }
 
 #title_useful-buttons > * {
