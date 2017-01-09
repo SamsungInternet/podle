@@ -129,7 +129,6 @@ main {
 	background: #4E3F30;
 	border-bottom: 0.5rem solid #0CA5B0;
 	color: white;
-	transform: scale(0.95) translateZ(25px);
 }
 
 .feed-item__audio-player .filler {
