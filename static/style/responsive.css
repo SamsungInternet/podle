@@ -5,7 +5,6 @@ body {
     display: flex;
     overflow: hidden;
     width: 100%;
-    perspective: 900px;
 }
 
 /* Let main be double width but it's contents half width*/
@@ -20,7 +19,7 @@ main > div.main-content {
     padding-right: 1rem;
     display: flex;
     flex-direction: column;
-    perspective: 500px;
+    will-change: transform;
 }
 
 main > div.main-content[data-used="1"] {
@@ -76,6 +75,8 @@ img {
 
 .feed-item {
     max-width: 100%;
+    min-width: 60%;
+    width: 768px;
     word-break: break-all;
     word-break: break-word;
 }

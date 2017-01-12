@@ -18,7 +18,7 @@ function updateSubscription(subscription) {
 	var subscriptionId = subscription.subscriptionId;
 	var unsubscribe = subscription.unsubscribe;
 
-	var endpoint = unsubscribe ? '/api/unsub' : '/api/sub';
+	var endpoint = 'https://feed-service.herokuapp.com' + (unsubscribe ? '/api/unsub' : '/api/sub');
 	var jsonHeader = new Headers({
 		'Content-Type': 'application/json',
 		'Accept': 'application/json'

@@ -133,10 +133,6 @@ d.run(function () {
 			const shoudJson = !!req.query.json;
 			const cacheBust = !!req.query.cb;
 			return fetchRSSItem(unfungleUrl(url), shouldDebug || shoudJson || cacheBust)
-				.catch(e => {
-					console.log(e.message, url);
-					return fetchRSSItem(unfungleUrl(url, true), shouldDebug || shoudJson || cacheBust)
-				})
 				.then(function (feedData) {
 
 					feedData.url = url;
