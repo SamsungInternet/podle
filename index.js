@@ -7,19 +7,15 @@ Error.stackTraceLimit = Infinity;
 const express = require('express');
 const exphbs = require('express-handlebars');
 const app = express();
-const getRSSItem = require('./lib/get-rss-item');
-const getSearchLegacy = require('./lib/search-legacy');
+const fetchRSSItem = require('./lib/fetch-rss-item');
 const getSearch = require('./lib/search');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const csp = require('helmet-csp');
 const audioProxy = require('./lib/audio-proxy');
-const {follow, unFollow} = require('./lib/push-notifications');
 const querystring = require('querystring');
 const URL = require('url');
 const domain = require('domain');
-const raygun = require('raygun');
-const raygunClient = new raygun.Client().init({ apiKey: 'Yzo/GzTraB2y8zVE92OPDg==' });
 
 app.set('json spaces', 2);
 app.use(helmet());
@@ -75,8 +71,7 @@ app.set('view engine', 'handlebars');
 const d = domain.create();
 
 d.on('error', function (err) {
-	raygunClient.send(err);
-	console.error('Error firing to Raygun', err.message, err.stack);
+	console.error('Error domain error: ', err.message, err.stack);
 	process.exit(1);
 });
 
@@ -106,24 +101,6 @@ d.run(function () {
 	app.use(bodyParser.json({
 		type: ['json', 'application/csp-report']
 	}));
-
-	app.get('/:version/search-legacy', function (req, res) {
-		const shouldDebug = !!req.query.debug;
-		getSearchLegacy(req.query.term)
-			.then(function (result) {
-				result.layout = req.params.version;
-				result.term = req.query.term;
-				res.render(shouldDebug ? 'search-debug' : 'search', result);
-			})
-			.catch(function (err) {
-				res.status(400);
-				res.render('error', {
-					term: req.query.term,
-					message: err.message,
-					layout: req.params.version
-				});
-			});
-	});
 
 	app.get('/:version/search', function (req, res) {
 		const shouldDebug = !!req.query.debug;
@@ -155,10 +132,10 @@ d.run(function () {
 			const shouldDebug = !!req.query.debug;
 			const shoudJson = !!req.query.json;
 			const cacheBust = !!req.query.cb;
-			return getRSSItem(unfungleUrl(url), shouldDebug || shoudJson || cacheBust)
+			return fetchRSSItem(unfungleUrl(url), shouldDebug || shoudJson || cacheBust)
 				.catch(e => {
 					console.log(e.message, url);
-					return getRSSItem(unfungleUrl(url, true), shouldDebug || shoudJson || cacheBust)
+					return fetchRSSItem(unfungleUrl(url, true), shouldDebug || shoudJson || cacheBust)
 				})
 				.then(function (feedData) {
 
@@ -220,44 +197,6 @@ d.run(function () {
 
 		return url;
 	}
-
-	app.post('/api/sub', function (req, res) {
-		const url = req.body.url;
-		const subscriptionId = req.body.subscriptionId;
-
-		if (!url || !subscriptionId) {
-			return res.status(400).json({
-				message: 'Missing body items'
-			});
-		} else {
-			follow(subscriptionId, unfungleUrl(url))
-				.then(() => res.status(200).json({ status: 'ok' }))
-				.catch(function (err) {
-					res.status(400).json({
-						message: err.message,
-					});
-				});
-		}
-	});
-
-	app.post('/api/unsub', function (req, res) {
-		const url = req.body.url;
-		const subscriptionId = req.body.subscriptionId;
-
-		if (!url || !subscriptionId) {
-			return res.status(400).json({
-				message: 'Missing body items'
-			});
-		} else {
-			unFollow(subscriptionId, unfungleUrl(url))
-				.then(() => res.status(200).json({ status: 'ok' }))
-				.catch(function (err) {
-					res.status(400).json({
-						message: err.message,
-					});
-				});
-		}
-	});
 
 	app.post('/api/report-violation', function (req, res) {
 		if (req.body && req.body['csp-report']) {
