@@ -143,6 +143,8 @@ d.run(function () {
 						}
 					});
 
+					feedData.items.reverse();
+
 					feedData.layout = req.params.version;
 					feedData.title = feedData.meta.title;
 					if (shoudJson) {
