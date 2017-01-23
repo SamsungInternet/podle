@@ -22,6 +22,10 @@ main > div.main-content {
     will-change: transform;
 }
 
+main > div.main-content > * {
+    flex-shrink: 0;
+}
+
 main > div.main-content[data-used="1"] {
     opacity: 0;
     transition: opacity 0.8s ease;
