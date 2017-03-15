@@ -42,6 +42,13 @@ blockquote {
 	padding-left: 0.5em;
 }
 
+/* Putting this in here to keep colours together*/
+@media (max-width: 600px) {
+	.hamburger-menu {
+		background: #0CA5B0;
+	}
+}
+
 /**
 	Garuntee minimum paragraph widths around floats
 */
@@ -62,9 +69,9 @@ footer {
 header {
 	align-items: baseline;
 	padding-right: 2em;
-	margin: 0 -1rem;
+	margin: 0 0 0 -1rem;
 	padding: 1rem;
-	background: #4E3F30;
+	background: #05668D;
 	border-bottom: 0.5rem solid #0CA5B0;
 	color: white;
 	background-image: url("/static/images/logo-white.svg");
@@ -78,6 +85,8 @@ header {
 
 header h1 {
 	flex-grow: 1;
+	line-height: 2rem;
+	font-size: 2rem;
 }
 
 header h1 a,
@@ -102,6 +111,10 @@ main {
 	padding-top: 0.3em;
 	background: white;
 	border-bottom: 1px solid grey;
+    box-shadow: 0 0.2em 0 0 rgba(255,255,255,0.95), 0 0.4em 0 0 rgba(255,255,255,0.5);
+    margin-left: -0.5rem;
+    padding-left: 0.5rem;
+	z-index: 100;
 }
 
 .feed-item {
@@ -110,7 +123,7 @@ main {
 	border-bottom: 0.5rem solid #0CA5B0;
 	padding-bottom: 1.5em;
 	margin-bottom: 2em;
-	box-shadow: 0 0 1em -0.5em #4E3F30;
+	box-shadow: 0 0 1em -0.5em #05668D;
 }
 
 .feed-item.finished {
@@ -126,7 +139,7 @@ main {
 	display: inline-block;
 	float: left;
 	margin-right: 1em;
-	background: #4E3F30;
+	background: #05668D;
 	border-bottom: 0.5rem solid #0CA5B0;
 	color: white;
 }
@@ -210,7 +223,7 @@ main .items .feed-item__meta-button-finished {
 	font-size: 1.5rem;
 	overflow: hidden;
 	text-align: center;
-	border: 2px solid #4E3F30;
+	border: 2px solid #05668D;
 	border-radius: 20%;
 }
 .feed-item__meta-button-finished[data-action="unfinish"]:before {
