@@ -111,29 +111,30 @@ function showMessage(message) {
 function debounce(dur, max, fn) {
 	var oldTimeout = -1;
 	var currentWait = 0;
-	var fired = false;
-	return function () {
+	var fn2;
+	return function debouncedFn() {
 		clearTimeout(oldTimeout);
 		currentWait += dur;
-		var self = this;
+		fn2 = fn2 || fn.bind(this);
 		if (currentWait > max) {
 			currentWait = 0;
-			fn.bind(self)();
+			fn2();
 		} else {
 			oldTimeout = setTimeout(function () {
 				currentWait = 0;
-				fn.bind(self)();
+				fn2();
 			}, dur);
 		}
 	}
 }
 
 function checkForScroll() {
-	if (this.scrollTop > 100) {
+	if (this.scrollTop > this.previousScrollTop && this.scrollTop > 200) {
 		document.querySelector('header').classList.add('mini');
 	} else {
 		document.querySelector('header').classList.remove('mini');
 	}
+	this.previousScrollTop = this.scrollTop;
 }
 
 function setUpMainContentEventListeners(el) {
@@ -228,6 +229,7 @@ function loadPage(url, pop) {
 			main: newMainEl
 		});
 		document.body.dispatchEvent(evt);
+		checkForScroll.bind(newMainEl)();
 	});
 }
 
