@@ -129,6 +129,11 @@ function debounce(dur, max, fn) {
 }
 
 function checkForScroll() {
+	if (
+		this.previousScrollTop !== undefined &&
+		Math.abs(this.scrollTop - this.previousScrollTop) < 24
+	) return;
+
 	if (this.scrollTop > this.previousScrollTop && this.scrollTop > 200) {
 		document.querySelector('header').classList.add('mini');
 	} else {
