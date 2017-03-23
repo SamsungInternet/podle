@@ -96,7 +96,7 @@ img {
 	}
 
 	main .main-content {
-		padding-top: 8.25rem;
+		padding-top: 4.25rem;
 	}
 
 	header, header h1 {
@@ -110,6 +110,10 @@ img {
 
 	header.mini h1 {
 		opacity: 0;
+	}
+
+	.feed-title {
+		padding-top: 4rem;
 	}
 
 	label[for="hamburger"] {
