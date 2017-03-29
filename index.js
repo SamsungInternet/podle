@@ -87,26 +87,20 @@ d.run(function () {
 	app.use('/sw-with-push.js', express.static(__dirname + '/static/sw-with-push.js'));
 
 	app.get('/', function (req, res) {
-		res.redirect('/v7' + req.url || '/');
-	});
-
-	app.get('/feed', function (req, res) {
-		res.redirect('/v7' + req.url || '/');
-	});
-
-	app.get('/search', function (req, res) {
-		res.redirect('/v7' + req.url || '/');
+		res.render('index', {
+			layout: 'layout'
+		});
 	});
 
 	app.use(bodyParser.json({
 		type: ['json', 'application/csp-report']
 	}));
 
-	app.get('/:version/search', function (req, res) {
+	app.get('/search', function (req, res) {
 		const shouldDebug = !!req.query.debug;
 		getSearch(req.query.term)
 			.then(function (result) {
-				result.layout = req.params.version;
+				result.layout = 'layout';
 				result.term = req.query.term;
 				res.render(shouldDebug ? 'search-debug' : 'search', result);
 			})
@@ -115,12 +109,12 @@ d.run(function () {
 				res.render('error', {
 					term: req.query.term,
 					message: err.message,
-					layout: req.params.version
+					layout: 'layout'
 				});
 			});
 	});
 
-	app.get('/:version/feed', function (req, res) {
+	app.get('/feed', function (req, res) {
 		if (req.query.url) {
 
 			// Parse and add format querystrings
@@ -145,7 +139,7 @@ d.run(function () {
 
 					feedData.items.reverse();
 
-					feedData.layout = req.params.version;
+					feedData.layout = 'layout';
 					feedData.title = feedData.meta.title;
 					if (shoudJson) {
 						return res.json(feedData);
@@ -158,23 +152,14 @@ d.run(function () {
 					res.render('error', {
 						message: err.message,
 						url: url,
-						layout: req.params.version
+						layout: 'layout'
 					});
 				});
 		}
 		res.status(400);
 		res.render('error', {
 			message: 'Invalid RSS URL',
-			layout: req.params.version
-		});
-	});
-
-	app.get('/:version/', function (req, res, next) {
-		if (!req.params.version.match(/^v[0-9]+/)) {
-			return next();
-		}
-		res.render('index', {
-			layout: req.params.version
+			layout: 'layout'
 		});
 	});
 
