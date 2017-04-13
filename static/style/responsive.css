@@ -167,6 +167,7 @@ img {
 	}
 
 	.hamburger:checked ~ .hamburger-menu {
+		pointer-events: none;
 		transform: rotateX(-112deg);
 		opacity: 0;
 	}
