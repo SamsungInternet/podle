@@ -93,6 +93,7 @@ img {
 		left: 1rem;
 		background-size: 7.5rem;
 		right: 0;
+		perspective: 100vmin;
 	}
 
 	main .main-content {
@@ -168,8 +169,9 @@ img {
 
 	.hamburger:checked ~ .hamburger-menu {
 		pointer-events: none;
-		transform: rotateX(-112deg);
+		transform: rotateX(-90deg);
 		opacity: 0;
+		transition-timing-function: ease;
 	}
 	.hamburger-menu {
 		position: absolute;
@@ -186,6 +188,8 @@ img {
 	.hamburger-menu input[type="submit"] {
 		background: #FEFEEB;
 		color: black;
+		border: 1px solid #0c787f;
+		border-left-width: 0;
 	}
 }
 

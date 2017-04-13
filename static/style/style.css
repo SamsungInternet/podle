@@ -259,9 +259,12 @@ main .items .feed-item__meta-button-finished {
 }
 
 label {
-	font-size: 0.8rem;
+	font-size: 1rem;
 	margin-right: 0.5em;
 	line-height: 1.75rem;
+	min-width: 3em;
+	flex-grow: 2;
+	text-align: right;
 }
 
 .banner-area {
@@ -289,21 +292,27 @@ button, input[type="submit"] {
 
 input {
     border-radius: 5px 0 0 5px;
-	height: 1.75rem;
+    height: 1.75rem;
     border: 1px solid #0c787f;
     padding: 0.5em;
+    flex-shrink: 1;
+    min-width: 7em;
 }
 
 input[type="submit"] {
-	border: none;
-    border-radius: 0 5px 5px 0;
-	width: 5em;
+	border-radius: 0 5px 5px 0;
+}
+
+form > .inline-group {
+	display: flex;
+	max-width: 100%;
 }
 
 header div form {
     display: flex;
     justify-content: flex-end;
-	margin-top: 0.1em;
+    margin-top: 0.1em;
+    flex-wrap: wrap;
 }
 
 .hamburger {
