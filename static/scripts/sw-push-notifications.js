@@ -114,6 +114,7 @@ self.addEventListener('push', function (event) {
 
 	const noti = self.registration.showNotification('Podcast updated', {
 		icon: 'https://podle.ada.is/static/icon192.png',
+		badge: 'https://podle.ada.is/static/images/badge.png',
 		data: data,
 		body: message
 	});
