@@ -18,7 +18,7 @@ function updateSubscription(subscription) {
 	var subscriptionId = subscription.subscriptionId;
 	var unsubscribe = subscription.unsubscribe;
 
-	var endpoint = 'http://localhost:3001' + (unsubscribe ? '/api/unsub' : '/api/sub');
+	var endpoint = location.origin + (unsubscribe ? '/api/unsub' : '/api/sub');
 	var jsonHeader = new Headers({
 		'Content-Type': 'application/json',
 		'Accept': 'application/json'
