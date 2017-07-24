@@ -46,6 +46,22 @@ self.addEventListener('fetch', function (event) {
 		return;
 	}
 
+	// Let the api routes not be cached.
+	// Ideally store for later on fail.
+	if (url.pathname === '/test-notification') {
+		self.onpush({
+			data: {
+				json: function () {
+					return {
+						title: 'Test Notification'
+					};
+				}
+			},
+			waitUntil: function () {}
+		});
+		return new Response('Hello World');
+	}
+
 	// Ideally this would do cacheFirst then update the page if the
 	// page has been updated
 	if (url.pathname === '/v7/feed') {

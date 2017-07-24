@@ -52,39 +52,7 @@ function getPodleApiForFeed(url) {
 	return ('/v7/feed?url=' + encodeURIComponent(url));
 }
 
-self.addEventListener('notificationclick', function(event) {
-	event.notification.close();
-
-	// This looks to see if the current is already open and
-	// focuses if it is
-	event.waitUntil(clients.matchAll({
-		type: 'window'
-	}).then(function(clientList) {
-		for (const i = 0; i < clientList.length; i++) {
-			const client = clientList[i];
-			if ('focus' in client) {
-				if (event.notification.data && event.notification.data.url) {
-					client.postMessage({
-						action: 'update',
-						url: event.notification.data
-					});
-				}
-				return client.focus();
-			}
-		}
-
-		// couldn't focus client so open a new window
-		if (clients.openWindow) {
-			if (event.notification.data && event.notification.data.url) {
-				return clients.openWindow(getPodleApiForFeed(event.notification.data.url));
-			} else {
-				return clients.openWindow('/');
-			}
-		};
-	}));
-});
-
-self.addEventListener('push', function (event) {
+self.onPush = function onpush(event) {
 	let message = 'One of your feeds has updated.';
 	let data = {};
 	let cachePromise = Promise.resolve();
@@ -116,10 +84,51 @@ self.addEventListener('push', function (event) {
 		icon: 'https://podle.ada.is/static/icon192.png',
 		badge: 'https://podle.ada.is/static/images/badge.png',
 		data: data,
-		body: message
+		body: message,
+		actions: [{
+			action: 'play',
+			title: '► Play Now'
+		},{
+			action: 'star',
+			title:'★ star'
+		}]
 	});
 
 	event.waitUntil(Promise.all([
 		noti, cachePromise
 	]));
+}
+
+self.addEventListener('push', onpush);
+
+self.addEventListener('notificationclick', function(event) {
+	event.notification.close();
+
+	// This looks to see if the current is already open and
+	// focuses if it is
+	event.waitUntil(clients.matchAll({
+		type: 'window'
+	}).then(function(clientList) {
+		for (const i = 0; i < clientList.length; i++) {
+			const client = clientList[i];
+			if ('focus' in client) {
+				if (event.notification.data && event.notification.data.url) {
+					client.postMessage({
+						action: 'update',
+						url: event.notification.data
+					});
+				}
+				return client.focus();
+			}
+		}
+
+		// couldn't focus client so open a new window
+		if (clients.openWindow) {
+			if (event.notification.data && event.notification.data.url) {
+				return clients.openWindow(getPodleApiForFeed(event.notification.data.url));
+			} else {
+				return clients.openWindow('/');
+			}
+		};
+	}));
 });
