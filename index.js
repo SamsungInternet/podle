@@ -28,7 +28,7 @@ app.use(csp({
 		fontSrc: ['\'self\'', 'fonts.gstatic.com'],
 		imgSrc: ['\'self\'', 'data:', 'https:'],
 		// reportUri: '/api/report-violation',
-		frameAncestors: ['none'],
+		frameAncestors: ['\'none\''],
 
 		objectSrc: [], // An empty array allows nothing through
 	},
