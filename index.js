@@ -120,6 +120,24 @@ d.run(function () {
 			});
 	});
 
+	app.get('/:version/latest-item-for-feed', function (req, res) {
+		if (req.query.url) {
+
+			// Parse and add format querystrings
+			let url = req.query.url;
+
+			if (!url) return;
+
+			const shouldDebug = !!req.query.debug;
+			const shoudJson = !!req.query.json;
+			const cacheBust = !!req.query.cb;
+			return fetchRSSItem(unfungleUrl(url), shouldDebug || shoudJson || cacheBust)
+				.then(function (feedData) {
+					res.json(feedData.items.pop());
+				});
+		}
+	});
+
 	app.get('/:version/feed', function (req, res) {
 		if (req.query.url) {
 
@@ -129,6 +147,11 @@ d.run(function () {
 				url = decodeURIComponent(url);
 			}
 
+			let autoplay = false;
+			if (req.query.autoplay) {
+				autoplay = req.query.autoplay;
+			}
+
 			const shouldDebug = !!req.query.debug;
 			const shoudJson = !!req.query.json;
 			const cacheBust = !!req.query.cb;
@@ -136,6 +159,10 @@ d.run(function () {
 				.then(function (feedData) {
 
 					feedData.url = url;
+
+					if (autoplay) {
+						feedData.autoplay = encodeURIComponent(autoplay);
+					}
 
 					feedData.items.forEach(item => {
 						if (item.enclosures && !item['media:content']) {
@@ -158,7 +185,7 @@ d.run(function () {
 					res.render('error', {
 						message: err.message,
 						url: url,
-						layout: req.params.version
+						layout: req.params.version,
 					});
 				});
 		}

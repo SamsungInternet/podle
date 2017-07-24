@@ -13,6 +13,8 @@
  */
 
 importScripts('/static/scripts/third-party/sw-toolbox.js');
+importScripts('/static/scripts/third-party/pouchdb-6.0.5.min.js');
+importScripts('/static/scripts/db.js');
 
 
 toolbox.precache([

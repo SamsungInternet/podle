@@ -2,9 +2,6 @@
 /* global PouchDB, Set */
 'use strict';
 
-var dbPodcasts = new PouchDB('podcastURLs');
-var dbPodcastItems = new PouchDB('podcastItems');
-
 var handleErr = function (e) {
 	console.log(e); // eslint-disable-line no-console
 }
@@ -68,20 +65,38 @@ function onAddToMyPodcasts(e) {
 		.then(dbPodcasts.put.bind(dbPodcasts))
 		.catch(handleErr);
 }
+
 function onAddToList(e) {
-	var doc = {
-		_id: e.target.dataset.feedItemId,
-		type: 'feed-item',
+	addToList(e.target.dataset.action === 'list', {
+		feedItemId: e.target.dataset.feedItemId, // url encoded url
 		title: e.target.dataset.title,
+		mediaUrl: e.target.dataset.mediaUrl, // url to the mp3 file (not url encoded)
+	});
+}
+
+function addToList(shouldAdd, data) {
+	var doc = {
+		_id: data.feedItemId,
+		type: 'feed-item',
+		title: data.title,
+		mediaUrl: data.mediaUrl
 	};
-	if (e.target.dataset.mediaUrl) doc.mediaUrl = e.target.dataset.mediaUrl;
-	if (e.target.dataset.action === 'list') dbPodcastItems
+
+	if (typeof dbPodcastItems === 'undefined') {
+		var dbPodcastItems = new PouchDB('podcastItems');
+	}
+
+	if (shouldAdd) {
+		dbPodcastItems
 		.put(doc)
 		.catch(handleErr);
-	if (e.target.dataset.action === 'unlist') dbPodcastItems
-		.get(doc._id).then(removeDoc)
+	} else {
+		dbPodcastItems
+		.get(doc._id)
+		.then(removeDoc)
 		.then(dbPodcastItems.put.bind(dbPodcastItems))
 		.catch(handleErr);
+	}
 }
 
 function addFeedItemButtons(item, read, listed) {
@@ -164,6 +179,8 @@ function addFeedButton(el, isSaved) {
 };
 
 var safeString = (function () {
+	if (typeof document === 'undefined') return;
+
 	var div = document.createElement('div');
 
 	function safeString(a) {
@@ -300,34 +317,45 @@ function updatePodcastItemsUI(readItems) {
 	});
 }
 
-dbPodcastItems.changes({
-	since: 'now',
-	live: true
-}).on('change', function (e) {
-	Array.from(document.querySelectorAll('.feed-item-detail[data-feed-item-id="' + safeString(e.id) + '"]'))
-		.forEach(function (target) {
-			addFeedItemButtons(target, undefined, !e.deleted);
-		});
-});
+if (typeof document !== 'undefined') {
 
-dbPodcasts.changes({
-	since: 'now',
-	live: true,
-	include_docs: true
-}).on('change', function (e) {
-	Array.from(document.querySelectorAll('.feed-detail[data-url="' + safeString(e.id) + '"]'))
-		.forEach(function (target) {
-			addFeedButton(target, !e.deleted);
-		});
-	Array.from(document.querySelectorAll('.feed-item-detail[data-feed="' + safeString(e.id) + '"]'))
-		.forEach(function (target) {
-			addFeedItemButtons(target, e.doc.read.indexOf(target.dataset.feedItemId) !== -1, undefined);
-		});
-});
+	// in the document
+	var dbPodcasts = new PouchDB('podcastURLs');
+	var dbPodcastItems = new PouchDB('podcastItems');
 
-function updatePage(e) {
-	updateAllPodcastUI(e && e.detail.main).then(updatePodcastItemsUI);
+	dbPodcastItems.changes({
+		since: 'now',
+		live: true
+	}).on('change', function (e) {
+		Array.from(document.querySelectorAll('.feed-item-detail[data-feed-item-id="' + safeString(e.id) + '"]'))
+			.forEach(function (target) {
+				addFeedItemButtons(target, undefined, !e.deleted);
+			});
+	});
+
+	dbPodcasts.changes({
+		since: 'now',
+		live: true,
+		include_docs: true
+	}).on('change', function (e) {
+		Array.from(document.querySelectorAll('.feed-detail[data-url="' + safeString(e.id) + '"]'))
+			.forEach(function (target) {
+				addFeedButton(target, !e.deleted);
+			});
+		Array.from(document.querySelectorAll('.feed-item-detail[data-feed="' + safeString(e.id) + '"]'))
+			.forEach(function (target) {
+				addFeedItemButtons(target, e.doc.read.indexOf(target.dataset.feedItemId) !== -1, undefined);
+			});
+	});
+
+	function updatePage(e) {
+		updateAllPodcastUI(e && e.detail.main).then(updatePodcastItemsUI);
+	}
+
+	updatePage();
+	document.body.addEventListener('pageupdate', updatePage);
+} else {
+	self.starItem = addToList;
 }
-updatePage();
-document.body.addEventListener('pageupdate', updatePage);
+
 

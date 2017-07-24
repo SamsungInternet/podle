@@ -48,14 +48,27 @@ function cache(url) {
     });
 }
 
-function getPodleApiForFeed(url) {
-	return ('/v7/feed?url=' + encodeURIComponent(url));
+function getPodleApiForFeed(urlIn, options) {
+	options = options || {};
+
+	let url = '/v7/feed?url=' + encodeURIComponent(urlIn);
+
+	if (options.autoplay) {
+		url += '&autoplay=' + options.autoplay;
+	}
+
+	return (url);
+}
+
+function getPodleApiForFirstFeedItem(url) {
+	return ('/v7/latest-item-for-feed?url=' + encodeURIComponent(url));
 }
 
 self.onPush = function onpush(event) {
 	let message = 'One of your feeds has updated.';
 	let data = {};
-	let cachePromise = Promise.resolve();
+	let networkPromise = Promise.resolve();
+	let actions = [];
 
 	if (event.data) {
 		try {
@@ -67,7 +80,26 @@ self.onPush = function onpush(event) {
 			message = data.title + ' has been updated.';
 		}
 		if (data.url) {
-			cachePromise = cache(getPodleApiForFeed(data.url));
+			const nextItemPromise = fetch(getPodleApiForFirstFeedItem(data.url))
+				.then(function (response) {
+					return response.json();
+				})
+				.catch(function () {
+					// oh well ¯\_(ツ)_/¯	
+					return {}
+				});
+
+			networkPromise = Promise.all([
+				nextItemPromise,
+				cache(getPodleApiForFeed(data.url))
+			]);
+			actions = [{
+				action: 'play',
+				title: '► Play Now'
+			},{
+				action: 'star',
+				title:'★ Star'
+			}];
 		}
 	}
 
@@ -80,23 +112,20 @@ self.onPush = function onpush(event) {
 		return;
 	}
 
-	const noti = self.registration.showNotification('Podcast updated', {
-		icon: 'https://podle.ada.is/static/icon192.png',
-		badge: 'https://podle.ada.is/static/images/badge.png',
-		data: data,
-		body: message,
-		actions: [{
-			action: 'play',
-			title: '► Play Now'
-		},{
-			action: 'star',
-			title:'★ star'
-		}]
-	});
+	event.waitUntil(
+		networkPromise
+		.then(function (arr) {
+			data.firstFeedItem = arr[0];
 
-	event.waitUntil(Promise.all([
-		noti, cachePromise
-	]));
+			return self.registration.showNotification('Podcast updated', {
+				icon: 'https://podle.ada.is/static/icon192.png',
+				badge: 'https://podle.ada.is/static/images/badge.png',
+				data: data,
+				body: message,
+				actions: actions
+			});
+		})
+	);
 }
 
 self.addEventListener('push', onpush);
@@ -104,20 +133,38 @@ self.addEventListener('push', onpush);
 self.addEventListener('notificationclick', function(event) {
 	event.notification.close();
 
+	const firstItem = event.notification.data.firstFeedItem;
+	let autoplay = false;
+
+	if (event.action === 'play') {
+		autoplay = true;
+	}
+
+	if (event.action === 'star') {
+		// Add to dm without opening page
+		self.starItem(true, {
+
+			// from views/feed.handlebars
+			feedItemId: firstItem.feedItemId,
+			title: firstItem.title,
+			mediaUrl: firstItem.enclosures ? firstItem.enclosures.url : undefined,
+		});
+		return;
+	}
+
 	// This looks to see if the current is already open and
 	// focuses if it is
 	event.waitUntil(clients.matchAll({
 		type: 'window'
 	}).then(function(clientList) {
+
+		autoplay = autoplay ? firstItem.feedItemId : false;
+
+		// Find a focusable client and focus it
 		for (const i = 0; i < clientList.length; i++) {
 			const client = clientList[i];
 			if ('focus' in client) {
-				if (event.notification.data && event.notification.data.url) {
-					client.postMessage({
-						action: 'update',
-						url: event.notification.data
-					});
-				}
+				client.navigate(getPodleApiForFeed(event.notification.data.url, {autoplay: autoplay}));
 				return client.focus();
 			}
 		}
@@ -125,7 +172,7 @@ self.addEventListener('notificationclick', function(event) {
 		// couldn't focus client so open a new window
 		if (clients.openWindow) {
 			if (event.notification.data && event.notification.data.url) {
-				return clients.openWindow(getPodleApiForFeed(event.notification.data.url));
+				return clients.openWindow(getPodleApiForFeed(event.notification.data.url, {autoplay: autoplay}));
 			} else {
 				return clients.openWindow('/');
 			}

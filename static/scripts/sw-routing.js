@@ -48,18 +48,19 @@ self.addEventListener('fetch', function (event) {
 
 	// Let the api routes not be cached.
 	// Ideally store for later on fail.
-	if (url.pathname === '/test-notification') {
-		self.onpush({
+	if (url.pathname === '/v7/test-notification') {
+		if (self.onPush) self.onPush({
 			data: {
 				json: function () {
 					return {
-						title: 'Test Notification'
+						title: 'Test Notification',
+						url: 'http://aliceisntdead.libsyn.com/rss'
 					};
 				}
 			},
 			waitUntil: function () {}
 		});
-		return new Response('Hello World');
+		return event.respondWith(new Response('Hello World'));
 	}
 
 	// Ideally this would do cacheFirst then update the page if the
