@@ -222,6 +222,7 @@ function loadPage(url, pop) {
 				}
 			})
 			.then(function () {
+				deeplink();
 				return url;
 			});
 
@@ -258,6 +259,20 @@ if (window.history.pushState && document.createRange) {
 		loadPage(document.location.toString(), true);
 	});
 }
+
+function deeplink() {
+	const search = document.location.search.match(/autoplay=([a-z0-9%-_.!~*'\(\)]+)/i);
+	if (search && search[1]) {
+		var feedItemId = search[1];
+		var el = document.querySelector('.feed-item__meta[data-feed-item-id="' + feedItemId + '"]');
+		if (el) {
+			el.scrollIntoView();
+			el.scrollTop = el.scrollTop + 16;
+		}
+	}
+}
+
+window.addEventListener('DOMContentLoaded', deeplink);
 
 var LOADING_SPINNER = '<div class="spinner"><h2>Loading...</h2></div>';
 
